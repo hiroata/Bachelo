@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { Database } from '@/types/database'
 
+export const dynamic = 'force-dynamic'
+
 const createOrderSchema = z.object({
   creatorId: z.string().uuid(),
   script: z.string().min(1).max(100),

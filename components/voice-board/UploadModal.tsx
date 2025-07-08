@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import { X, Upload, Mic, Play, Pause } from 'lucide-react'
 import { voicePostSchema } from '@/lib/validations/voice-post'
-import { handleError } from '@/lib/utils/error-handler'
+import { handleError } from '@/lib/utils/error-handler.client'
 import { toast } from 'react-hot-toast'
 
 interface UploadModalProps {

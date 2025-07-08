@@ -1,4 +1,5 @@
-import { toast } from 'react-hot-toast'
+// Note: This file should not import client-side libraries
+// For client-side error handling with toast, use error-handler.client.ts
 
 export class AppError extends Error {
   constructor(
@@ -48,16 +49,14 @@ export function getErrorMessage(error: unknown): string {
 }
 
 /**
- * エラーハンドリングユーティリティ
+ * エラーハンドリングユーティリティ (Server-side version)
  */
-export function handleError(error: unknown, showToast = true): void {
+export function handleError(error: unknown): string {
   const message = getErrorMessage(error)
   
   console.error('Error occurred:', error)
   
-  if (showToast) {
-    toast.error(message)
-  }
+  return message
 }
 
 /**
@@ -106,7 +105,8 @@ export async function tryCatch<T>(
   try {
     return await fn()
   } catch (error) {
-    handleError(errorMessage || error)
+    const message = errorMessage || handleError(error)
+    console.error('tryCatch error:', message)
     return null
   }
 }

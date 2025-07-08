@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+export const dynamic = "force-dynamic"
+
 // モックデータ生成API
 export async function GET() {
   const mockCreators = [

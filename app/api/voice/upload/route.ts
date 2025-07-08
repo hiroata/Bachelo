@@ -4,6 +4,8 @@ import { uploadVoiceFile, getAudioDuration, validateAudioFile } from '@/lib/stor
 import { hashIPAddress } from '@/lib/utils/server-utils'
 import { headers } from 'next/headers'
 
+export const dynamic = "force-dynamic"
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = createServerClient()
