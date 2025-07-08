@@ -1,48 +1,81 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import CreatorCard from '@/components/creator/CreatorCard'
-import { Database } from '@/types/database'
+'use client'
 
-export default async function HomePage() {
-  const supabase = createServerComponentClient<Database>({ cookies })
-  
-  // アクティブなクリエイターを取得
-  const { data: creators } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('role', 'creator')
-    .eq('is_accepting_orders', true)
-    .order('created_at', { ascending: false })
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/Button'
+import { Mic, MessageSquare, Users } from 'lucide-react'
+
+export default function HomePage() {
   
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">VoiceEros</h1>
-          <p className="mt-2 text-gray-600">プロフェッショナルなアダルトボイスクリエイター</p>
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white">
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            VoiceEros へようこそ
+          </h1>
+          <p className="text-xl text-gray-600">
+            匿名で楽しめる音声投稿プラットフォーム
+          </p>
         </div>
-      </header>
-      
-      <main className="container mx-auto px-4 py-8">
-        {creators && creators.length > 0 ? (
-          <>
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-xl font-semibold">クリエイター一覧</h2>
-              <p className="text-sm text-gray-500">{creators.length}名のクリエイター</p>
+
+        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <Link href="/voice-board">
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer">
+              <div className="flex justify-center mb-4">
+                <Mic className="w-16 h-16 text-pink-500" />
+              </div>
+              <h2 className="text-2xl font-semibold text-center mb-2">
+                音声掲示板
+              </h2>
+              <p className="text-gray-600 text-center">
+                匿名で音声を投稿・視聴できます
+              </p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {creators.map((creator) => (
-                <CreatorCard key={creator.id} creator={creator} />
-              ))}
+          </Link>
+
+          <Link href="/board">
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer">
+              <div className="flex justify-center mb-4">
+                <MessageSquare className="w-16 h-16 text-pink-500" />
+              </div>
+              <h2 className="text-2xl font-semibold text-center mb-2">
+                掲示板
+              </h2>
+              <p className="text-gray-600 text-center">
+                テキストと画像で交流できます
+              </p>
             </div>
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500">現在、登録されているクリエイターはいません</p>
-          </div>
-        )}
-      </main>
+          </Link>
+
+          <Link href="/creators">
+            <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer">
+              <div className="flex justify-center mb-4">
+                <Users className="w-16 h-16 text-pink-500" />
+              </div>
+              <h2 className="text-2xl font-semibold text-center mb-2">
+                クリエイター
+              </h2>
+              <p className="text-gray-600 text-center">
+                お気に入りのクリエイターを見つけよう
+              </p>
+            </div>
+          </Link>
+        </div>
+
+        <div className="text-center mt-12">
+          <Link href="/register">
+            <Button size="lg" className="mr-4">
+              新規登録
+            </Button>
+          </Link>
+          <Link href="/login">
+            <Button size="lg" variant="outline">
+              ログイン
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }
