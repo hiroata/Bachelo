@@ -116,8 +116,9 @@ npm run lint
 - 実際の決済処理は実装されていません（モック）
 - Vercel Hobbyプランは商用利用不可
 - 必ず利用規約とプライバシーポリシーを作成してください
-## 最新ビルド修正 2025-07-08_13:54:00
+## キャッシュクリア後の再デプロイ 2025-07-08_21:41:00
 
-- Client/Server error handler分離
-- Suspense boundary追加
-- API routes dynamic export追加
+- ローカルキャッシュをクリア
+- node_modules再インストール
+- Next.js設定を簡素化
+- Vercelビルドエラー修正
