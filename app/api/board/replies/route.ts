@@ -3,6 +3,8 @@ import { createServerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 
+export const dynamic = 'force-dynamic';
+
 const createReplySchema = z.object({
   post_id: z.string().uuid(),
   parent_reply_id: z.string().uuid().optional(),

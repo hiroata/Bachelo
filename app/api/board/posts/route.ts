@@ -4,6 +4,8 @@ import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 import { postRateLimiter } from '@/lib/utils/rate-limiter';
 
+export const dynamic = 'force-dynamic';
+
 const createPostSchema = z.object({
   category_id: z.string().uuid(),
   author_name: z.string().min(1).max(100),

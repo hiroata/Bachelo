@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { BoardCategory, BoardPost } from '@/types/board';
 
-export default function BoardPage() {
+function BoardContent() {
   const searchParams = useSearchParams();
   const [categories, setCategories] = useState<BoardCategory[]>([]);
   const [posts, setPosts] = useState<BoardPost[]>([]);
@@ -322,5 +322,13 @@ function PostModal({
         </form>
       </div>
     </div>
+  );
+}
+
+export default function BoardPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-8">読み込み中...</div>}>
+      <BoardContent />
+    </Suspense>
   );
 }
