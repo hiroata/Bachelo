@@ -6,7 +6,7 @@ import { Database } from '@/types/database'
 import VoicePostCard from '@/components/timeline/VoicePostCard'
 import PostVoiceModal from '@/components/timeline/PostVoiceModal'
 import { Button } from '@/components/ui/Button'
-import { Mic, Filter } from 'lucide-react'
+import { Mic } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
 type VoicePost = Database['public']['Tables']['voice_posts']['Row'] & {
@@ -59,7 +59,7 @@ export default function TimelinePage() {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [filter])
+  }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
   
   const loadPosts = async () => {
     setLoading(true)

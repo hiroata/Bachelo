@@ -107,7 +107,7 @@ export default function VoiceBoardPage() {
   
   useEffect(() => {
     fetchInitialPosts()
-  }, [activeCategory])
+  }, [activeCategory]) // eslint-disable-line react-hooks/exhaustive-deps
   
   const handleUploadComplete = () => {
     setShowUploadModal(false)

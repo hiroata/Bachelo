@@ -134,12 +134,3 @@ export async function getAudioDuration(file: File): Promise<number> {
   })
 }
 
-/**
- * IPアドレスをハッシュ化（プライバシー保護）
- * サーバーサイドで実行する必要があるため、APIルートに移動
- */
-export function hashIPAddress(ip: string): string {
-  // クライアントサイドでは仮の実装
-  // 実際のハッシュ化はサーバーサイドで実行
-  return 'client-hash-' + btoa(ip)
-}
