@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     // ハードコードされたカテゴリーデータを返す（Supabase接続の問題を回避）
     const categories = [
       {
-        id: '79a27621-c014-4e7e-86bc-24b64bf16d1',
+        id: '79a27621-c014-4e7e-86bc-24b64bf16d10',
         name: '雑談',
         slug: 'general',
         description: '自由な話題で交流',
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
         is_active: true
       },
       {
-        id: '95f6aad3-4ba2-48b6-ba71-9cc49ddbe34',
+        id: '95f6aad3-4ba2-48b6-ba71-9cc49ddbe340',
         name: '質問',
         slug: 'questions', 
         description: '技術的な質問や相談',
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         is_active: true
       },
       {
-        id: 'de19411d-a7ee-4519-b37b-45c1df70737',
+        id: 'de19411d-a7ee-4519-b37b-45c1df707370',
         name: 'レビュー',
         slug: 'reviews',
         description: '商品やサービスのレビュー',

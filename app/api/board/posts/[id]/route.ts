@@ -12,7 +12,7 @@ export async function GET(
     const mockPosts: Record<string, any> = {
       '1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p': {
         id: '1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p',
-        category_id: '79a27621-c014-4e7e-86bc-24b64bf16d1',
+        category_id: '79a27621-c014-4e7e-86bc-24b64bf16d10',
         author_name: 'テストユーザー1',
         author_email: 'test1@example.com',
         title: 'はじめての投稿です',
@@ -25,7 +25,7 @@ export async function GET(
         created_at: '2025-01-08T10:00:00Z',
         updated_at: '2025-01-08T10:00:00Z',
         category: {
-          id: '79a27621-c014-4e7e-86bc-24b64bf16d1',
+          id: '79a27621-c014-4e7e-86bc-24b64bf16d10',
           name: '雑談',
           slug: 'general',
           description: '自由な話題で交流',
@@ -59,7 +59,7 @@ export async function GET(
       },
       '2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q': {
         id: '2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q',
-        category_id: '95f6aad3-4ba2-48b6-ba71-9cc49ddbe34',
+        category_id: '95f6aad3-4ba2-48b6-ba71-9cc49ddbe340',
         author_name: 'テストユーザー2',
         author_email: 'test2@example.com',
         title: 'Next.jsの質問です',
@@ -72,7 +72,7 @@ export async function GET(
         created_at: '2025-01-08T09:00:00Z',
         updated_at: '2025-01-08T09:00:00Z',
         category: {
-          id: '95f6aad3-4ba2-48b6-ba71-9cc49ddbe34',
+          id: '95f6aad3-4ba2-48b6-ba71-9cc49ddbe340',
           name: '質問',
           slug: 'questions',
           description: '技術的な質問や相談',
