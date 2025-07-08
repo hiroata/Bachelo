@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createAnonClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       ALLOWED_ATTR: ['href', 'target', 'rel'],
     });
     
-    const supabase = createServerClient();
+    const supabase = createAnonClient();
     
     // IPアドレスとユーザーエージェントを取得
     const ip_address = request.headers.get('x-forwarded-for') || 

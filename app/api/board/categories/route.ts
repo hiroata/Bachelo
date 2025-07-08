@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createAnonClient } from '@/lib/supabase/service';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerClient();
+    const supabase = createAnonClient();
     
     const { data: categories, error } = await supabase
       .from('board_categories')
@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
       .order('display_order', { ascending: true });
     
     if (error) {
+      console.error('Supabase error:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
     
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }

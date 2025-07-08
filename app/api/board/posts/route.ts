@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createAnonClient } from '@/lib/supabase/service';
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 import { postRateLimiter } from '@/lib/utils/rate-limiter';
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const category_id = searchParams.get('category_id');
     const search = searchParams.get('search');
     
-    const supabase = createServerClient();
+    const supabase = createAnonClient();
     
     let query = supabase
       .from('board_posts')
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       ALLOWED_ATTR: [],
     });
     
-    const supabase = createServerClient();
+    const supabase = createAnonClient();
     
     // ユーザーエージェントを取得
     const user_agent = request.headers.get('user-agent') || 'unknown';

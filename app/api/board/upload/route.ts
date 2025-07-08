@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createAnonClient } from '@/lib/supabase/server';
 import { nanoid } from 'nanoid';
 
 export const dynamic = 'force-dynamic';
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const supabase = createServerClient();
+    const supabase = createAnonClient();
     const uploadedImages = [];
     
     for (const file of files) {
