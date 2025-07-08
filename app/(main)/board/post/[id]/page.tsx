@@ -114,10 +114,10 @@ export default function PostDetailPage() {
       {/* 返信一覧 */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold mb-4">
-          返信 ({post.replies?.length || 0}件)
+          返信 ({Array.isArray(post.replies) ? post.replies.length : 0}件)
         </h2>
         
-        {post.replies?.map((reply) => (
+        {Array.isArray(post.replies) && post.replies.map((reply) => (
           <ReplyItem
             key={reply.id}
             reply={reply}
@@ -183,7 +183,7 @@ function ReplyItem({
       </Button>
 
       {/* 子返信 */}
-      {reply.replies?.map((childReply) => (
+      {Array.isArray(reply.replies) && reply.replies.map((childReply) => (
         <ReplyItem
           key={childReply.id}
           reply={childReply}

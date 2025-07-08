@@ -31,10 +31,22 @@ function BoardContent() {
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/board/categories');
+      if (!response.ok) {
+        console.error('Failed to fetch categories:', response.status);
+        setCategories([]);
+        return;
+      }
       const data = await response.json();
-      setCategories(data);
+      // dataが配列であることを確認
+      if (Array.isArray(data)) {
+        setCategories(data);
+      } else {
+        console.error('Invalid categories data:', data);
+        setCategories([]);
+      }
     } catch (error) {
       console.error('Failed to fetch categories:', error);
+      setCategories([]);
     }
   };
 
@@ -50,11 +62,27 @@ function BoardContent() {
       }
       
       const response = await fetch(`/api/board/posts?${params}`);
+      if (!response.ok) {
+        console.error('Failed to fetch posts:', response.status);
+        setPosts([]);
+        setTotalPages(1);
+        return;
+      }
+      
       const data = await response.json();
-      setPosts(data.posts);
-      setTotalPages(data.total_pages);
+      // dataが正しい形式であることを確認
+      if (data && Array.isArray(data.posts)) {
+        setPosts(data.posts);
+        setTotalPages(data.total_pages || 1);
+      } else {
+        console.error('Invalid posts data:', data);
+        setPosts([]);
+        setTotalPages(1);
+      }
     } catch (error) {
       console.error('Failed to fetch posts:', error);
+      setPosts([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -73,7 +101,7 @@ function BoardContent() {
             すべて
           </Button>
         </Link>
-        {categories.map((category) => (
+        {Array.isArray(categories) && categories.map((category) => (
           <Link
             key={category.id}
             href={`/board?category=${category.id}`}
@@ -100,6 +128,10 @@ function BoardContent() {
       {/* 投稿一覧 */}
       {loading ? (
         <div className="text-center py-8">読み込み中...</div>
+      ) : posts.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">
+          投稿がありません
+        </div>
       ) : (
         <div className="space-y-4">
           {posts.map((post) => (
@@ -181,7 +213,7 @@ function PostModal({
   onSuccess: () => void;
 }) {
   const [formData, setFormData] = useState({
-    category_id: categories[0]?.id || '',
+    category_id: Array.isArray(categories) && categories.length > 0 ? categories[0].id : '',
     author_name: '',
     author_email: '',
     title: '',
@@ -243,7 +275,7 @@ function PostModal({
               className="w-full p-2 border rounded"
               required
             >
-              {categories.map((category) => (
+              {Array.isArray(categories) && categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
