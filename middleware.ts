@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
+<<<<<<< HEAD
   const ageVerified = request.cookies.get('age_verified')
   const pathname = request.nextUrl.pathname
   
@@ -20,6 +21,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/age-gate', request.url))
   }
   
+=======
+  // 年齢確認を無効化 - すべてのリクエストを通す
+>>>>>>> 446ee5bdb9362137b7929f741efde0add2fde644
   return NextResponse.next()
 }
 
