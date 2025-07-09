@@ -1,0 +1,56 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Region {
+  id    Int    @id @default(autoincrement())
+  name  String @unique // 例: 「北海道」「東北」「関東」
+  slug  String @unique // URL用スラッグ 例: "hokkaido", "tohoku"
+  order Int    // 表示順序
+  areas Area[]
+}
+
+model Area {
+  id       Int      @id @default(autoincrement())
+  name     String   // 例: 「札幌」「函館」「東京」「大阪」
+  slug     String   @unique // URL用スラッグ 例: "sapporo", "tokyo"
+  regionId Int
+  region   Region   @relation(fields: [regionId], references: [id])
+  threads  Thread[]
+}
+
+model Thread {
+  id        Int      @id @default(autoincrement())
+  areaId    Int      // どのエリアに属するスレッドか
+  area      Area     @relation(fields: [areaId], references: [id]) // 関連付けを追加
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt // レス投稿時に更新（sageの場合は更新しない）
+  posts     Post[]
+}
+
+model Post {
+  id              Int      @id @default(autoincrement())
+  threadId        Int
+  thread          Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  postNumber      Int      // スレッド内での投稿番号 (1から始まる)
+
+  name            String?
+  email           String?  // "sage"判定に使用
+  body            String
+
+  trip            String?  // 生成されたトリップ
+  userId          String   // 日付とIPから生成されるID
+
+  deletePassword  String?  // ハッシュ化された削除パスワード
+  ipAddress       String   // サーバー側で記録
+
+  createdAt       DateTime @default(now())
+
+  @@unique([threadId, postNumber]) // 同じスレッドで投稿番号が重複しないようにする
+}
