@@ -12,7 +12,7 @@ type Tables = Database['public']['Tables']
 /**
  * ページネーション付きでデータを取得
  */
-export async function getPaginated<T extends keyof Tables>(
+export async function getPaginated<T extends keyof Tables | string>(
   tableName: T,
   options: {
     page?: number
@@ -63,7 +63,7 @@ export async function getPaginated<T extends keyof Tables>(
 /**
  * IDでレコードを取得
  */
-export async function getById<T extends keyof Tables>(
+export async function getById<T extends keyof Tables | string>(
   tableName: T,
   id: string,
   options: {
@@ -86,7 +86,7 @@ export async function getById<T extends keyof Tables>(
 /**
  * レコードを作成
  */
-export async function create<T extends keyof Tables>(
+export async function create<T extends keyof Tables | string>(
   tableName: T,
   data: Omit<Tables[T]['Insert'], 'id' | 'created_at' | 'updated_at'>
 ) {
@@ -105,7 +105,7 @@ export async function create<T extends keyof Tables>(
 /**
  * レコードを更新
  */
-export async function update<T extends keyof Tables>(
+export async function update<T extends keyof Tables | string>(
   tableName: T,
   id: string,
   data: Partial<Tables[T]['Update']>
@@ -126,7 +126,7 @@ export async function update<T extends keyof Tables>(
 /**
  * レコードを削除
  */
-export async function remove<T extends keyof Tables>(
+export async function remove<T extends keyof Tables | string>(
   tableName: T,
   id: string
 ) {

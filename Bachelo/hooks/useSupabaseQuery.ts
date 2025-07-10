@@ -22,7 +22,7 @@ interface QueryState<T> {
 /**
  * ページネーション付きデータ取得フック
  */
-export function usePaginatedQuery<T extends keyof Tables>(
+export function usePaginatedQuery<T extends keyof Tables | string>(
   tableName: T,
   options: {
     page?: number;
@@ -102,7 +102,7 @@ export function usePaginatedQuery<T extends keyof Tables>(
 /**
  * 単一レコード取得フック
  */
-export function useSingleQuery<T extends keyof Tables>(
+export function useSingleQuery<T extends keyof Tables | string>(
   tableName: T,
   id: string | null,
   options: {
@@ -149,7 +149,7 @@ export function useSingleQuery<T extends keyof Tables>(
 /**
  * リアルタイムサブスクリプションフック
  */
-export function useRealtimeSubscription<T extends keyof Tables>(
+export function useRealtimeSubscription<T extends keyof Tables | string>(
   tableName: T,
   options: {
     event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
@@ -280,7 +280,7 @@ export function useVoicePosts(
 /**
  * ミューテーション（作成・更新・削除）フック
  */
-export function useMutation<T extends keyof Tables>() {
+export function useMutation<T extends keyof Tables | string>() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
