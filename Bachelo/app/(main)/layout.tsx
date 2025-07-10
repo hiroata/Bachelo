@@ -30,7 +30,7 @@ export default function MainLayout({
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
               <Link href="/" className="text-2xl font-bold text-pink-500">
-                VoiceEros
+                BACHELO
               </Link>
               
               <div className="hidden md:flex space-x-4">

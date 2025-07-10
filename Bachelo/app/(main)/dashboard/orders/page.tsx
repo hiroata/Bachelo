@@ -64,8 +64,12 @@ export default function OrdersPage() {
       toast.success('音声ファイルをアップロードしました')
       fetchOrders() // リロード
       setSelectedOrder(null)
-    } catch (error: any) {
-      toast.error(error.message || 'アップロードに失敗しました')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message || 'アップロードに失敗しました')
+      } else {
+        toast.error('アップロードに失敗しました')
+      }
     } finally {
       setUploading(false)
     }

@@ -106,8 +106,12 @@ export default function OrderPage({ params }: PageProps) {
       
       toast.success('注文が完了しました！')
       router.push(`/dashboard/orders`)
-    } catch (error: any) {
-      toast.error(error.message || '注文の作成に失敗しました')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message || '注文の作成に失敗しました')
+      } else {
+        toast.error('注文の作成に失敗しました')
+      }
       console.error(error)
     } finally {
       setIsLoading(false)

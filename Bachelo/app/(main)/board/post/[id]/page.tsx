@@ -1,296 +1,397 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
-import { BoardPost, BoardReply } from '@/types/board';
+import { BoardPost, BoardReply, CreateBoardReplyInput } from '@/types/board';
+import ReplyModal from '@/components/board/ReplyModal';
 
 export default function PostDetailPage() {
   const params = useParams();
   const postId = params.id as string;
   const [post, setPost] = useState<BoardPost | null>(null);
+  const [replies, setReplies] = useState<BoardReply[]>([]);
   const [loading, setLoading] = useState(true);
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [voting, setVoting] = useState(false);
 
-  useEffect(() => {
-    fetchPost();
-  }, [postId]);
-
-  const fetchPost = async () => {
+  const fetchPostDetails = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/board/posts/${postId}`);
       if (!response.ok) {
-        throw new Error('Post not found');
+        throw new Error('Failed to fetch post');
       }
       const data = await response.json();
-      setPost(data);
+      setPost(data.post || data);
+      setReplies(data.replies || []);
     } catch (error) {
-      console.error('Failed to fetch post:', error);
+      console.error('Error fetching post:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [postId]);
 
-  if (loading) {
-    return <div className="container mx-auto px-4 py-8">読み込み中...</div>;
-  }
+  useEffect(() => {
+    if (postId) {
+      fetchPostDetails();
+    }
+  }, [postId, fetchPostDetails]);
 
-  if (!post) {
-    return <div className="container mx-auto px-4 py-8">投稿が見つかりません</div>;
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* パンくずリスト */}
-      <div className="mb-4 text-sm">
-        <Link href="/board" className="text-pink-500 hover:underline">
-          掲示板
-        </Link>
-        {' > '}
-        <Link
-          href={`/board?category=${post.category?.id}`}
-          className="text-pink-500 hover:underline"
-        >
-          {post.category?.name}
-        </Link>
-        {' > '}
-        <span>{post.title}</span>
-      </div>
-
-      {/* 投稿本文 */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-        <h1 className="text-2xl font-bold mb-4">
-          {post.is_pinned && <span className="text-red-500 mr-2">📌</span>}
-          {post.title}
-        </h1>
-        
-        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 space-x-4 mb-4">
-          <span>投稿者: {post.author_name}</span>
-          <span>投稿日: {new Date(post.created_at).toLocaleString()}</span>
-          <span>閲覧数: {post.view_count}</span>
-        </div>
-
-        <div
-          className="prose dark:prose-invert max-w-none mb-6"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
-
-        {/* 画像 */}
-        {post.images && post.images.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {post.images.map((image) => (
-              <a
-                key={image.id}
-                href={image.image_url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src={image.image_url}
-                  alt=""
-                  className="w-full h-40 object-cover rounded hover:opacity-90 transition-opacity"
-                />
-              </a>
-            ))}
-          </div>
-        )}
-
-        <div className="flex gap-4">
-          <Button
-            onClick={() => {
-              setShowReplyForm(true);
-              setReplyingTo(null);
-            }}
-            className="bg-pink-500 hover:bg-pink-600"
-          >
-            返信する
-          </Button>
-        </div>
-      </div>
-
-      {/* 返信一覧 */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold mb-4">
-          返信 ({post.replies?.length || 0}件)
-        </h2>
-        
-        {post.replies?.map((reply) => (
-          <ReplyItem
-            key={reply.id}
-            reply={reply}
-            onReply={(replyId) => {
-              setShowReplyForm(true);
-              setReplyingTo(replyId);
-            }}
-          />
-        ))}
-      </div>
-
-      {/* 返信フォーム */}
-      {showReplyForm && (
-        <ReplyForm
-          postId={postId}
-          parentReplyId={replyingTo}
-          onClose={() => {
-            setShowReplyForm(false);
-            setReplyingTo(null);
-          }}
-          onSuccess={() => {
-            setShowReplyForm(false);
-            setReplyingTo(null);
-            fetchPost();
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-function ReplyItem({
-  reply,
-  onReply,
-  depth = 0,
-}: {
-  reply: BoardReply;
-  onReply: (replyId: string) => void;
-  depth?: number;
-}) {
-  return (
-    <div
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 ${
-        depth > 0 ? 'ml-8' : ''
-      }`}
-    >
-      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 space-x-4 mb-2">
-        <span>投稿者: {reply.author_name}</span>
-        <span>{new Date(reply.created_at).toLocaleString()}</span>
-      </div>
-      
-      <div
-        className="prose dark:prose-invert max-w-none mb-2"
-        dangerouslySetInnerHTML={{ __html: reply.content }}
-      />
-      
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => onReply(reply.id)}
-      >
-        返信
-      </Button>
-
-      {/* 子返信 */}
-      {reply.replies?.map((childReply) => (
-        <ReplyItem
-          key={childReply.id}
-          reply={childReply}
-          onReply={onReply}
-          depth={depth + 1}
-        />
-      ))}
-    </div>
-  );
-}
-
-function ReplyForm({
-  postId,
-  parentReplyId,
-  onClose,
-  onSuccess,
-}: {
-  postId: string;
-  parentReplyId: string | null;
-  onClose: () => void;
-  onSuccess: () => void;
-}) {
-  const [formData, setFormData] = useState({
-    author_name: '',
-    author_email: '',
-    content: '',
-  });
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const handleReplySubmit = async (replyData: Omit<CreateBoardReplyInput, 'post_id'>) => {
     try {
       const response = await fetch('/api/board/replies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          ...replyData,
           post_id: postId,
-          parent_reply_id: parentReplyId,
-          ...formData,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create reply');
+        throw new Error('Failed to post reply');
       }
 
-      onSuccess();
+      setShowReplyForm(false);
+      fetchPostDetails();
     } catch (error) {
-      console.error('Error creating reply:', error);
+      console.error('Error posting reply:', error);
       alert('返信の投稿に失敗しました');
-    } finally {
-      setLoading(false);
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full p-6">
-        <h2 className="text-xl font-bold mb-4">返信を投稿</h2>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">名前</label>
-            <input
-              type="text"
-              value={formData.author_name}
-              onChange={(e) => setFormData({ ...formData, author_name: e.target.value })}
-              className="w-full p-2 border rounded"
-              required
-              maxLength={100}
-            />
-          </div>
+  const handleVote = async (voteType: 'plus' | 'minus') => {
+    if (voting) return;
+    
+    setVoting(true);
+    try {
+      const response = await fetch(`/api/board/posts/${postId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vote_type: voteType }),
+      });
 
-          <div>
-            <label className="block text-sm font-medium mb-1">メールアドレス（任意）</label>
-            <input
-              type="email"
-              value={formData.author_email}
-              onChange={(e) => setFormData({ ...formData, author_email: e.target.value })}
-              className="w-full p-2 border rounded"
-            />
-          </div>
+      if (!response.ok) {
+        throw new Error('Failed to vote');
+      }
 
-          <div>
-            <label className="block text-sm font-medium mb-1">本文</label>
-            <textarea
-              value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              className="w-full p-2 border rounded"
-              rows={6}
-              required
-              maxLength={5000}
-            />
-          </div>
+      const data = await response.json();
+      setPost(prev => prev ? {
+        ...prev,
+        plus_count: data.plus_count,
+        minus_count: data.minus_count
+      } : null);
+    } catch (error) {
+      console.error('Error voting:', error);
+    } finally {
+      setVoting(false);
+    }
+  };
 
-          <div className="flex gap-4">
-            <Button type="submit" disabled={loading}>
-              {loading ? '投稿中...' : '投稿する'}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
-              キャンセル
-            </Button>
-          </div>
-        </form>
+  const handleReplyVote = async (replyId: string, voteType: 'plus' | 'minus') => {
+    if (voting) return;
+    
+    setVoting(true);
+    try {
+      const response = await fetch(`/api/board/replies/${replyId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vote_type: voteType }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to vote on reply');
+      }
+
+      const data = await response.json();
+      setReplies(prev => prev.map(reply => 
+        reply.id === replyId 
+          ? { ...reply, plus_count: data.plus_count, minus_count: data.minus_count }
+          : reply
+      ));
+    } catch (error) {
+      console.error('Error voting on reply:', error);
+    } finally {
+      setVoting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen" style={{ backgroundColor: '#E8E8E8' }}>
+        <div className="max-w-6xl mx-auto p-4">
+          <div className="text-center py-8">読み込み中...</div>
+        </div>
       </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="min-h-screen" style={{ backgroundColor: '#E8E8E8' }}>
+        <div className="max-w-6xl mx-auto p-4">
+          <div className="text-center py-8">投稿が見つかりません</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: '#E8E8E8' }}>
+      <div className="flex gap-6 py-4" style={{ paddingLeft: '200px', paddingRight: '200px' }}>
+        {/* メインコンテンツ */}
+        <div className="flex-[7] bg-white rounded">
+          <div className="p-4">
+            {/* パンくずリスト */}
+            <div className="text-sm mb-4">
+              <Link href="/board" className="text-blue-600 hover:underline">掲示板</Link>
+              {' > '}
+              {post.category && (
+                <>
+                  <Link href={`/board?category=${post.category.id}`} className="text-blue-600 hover:underline">
+                    {post.category.name}
+                  </Link>
+                  {' > '}
+                </>
+              )}
+              <span className="text-gray-600">{post.title}</span>
+            </div>
+
+            {/* スレッドタイトル */}
+            <h1 className="text-2xl font-bold mb-4 pb-4 border-b">
+              {post.is_pinned && <span className="text-red-500 mr-2">📌</span>}
+              {post.title}
+            </h1>
+
+            {/* 最初の投稿 */}
+            <div className="mb-6">
+              {/* 投稿ヘッダー */}
+              <div className="text-sm text-gray-500 mb-3">
+                <span className="mr-2 font-normal">1</span>
+                <span className="mr-2">管理人</span>
+                <span className="mr-2">{new Date(post.created_at).toLocaleString('ja-JP', { 
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  weekday: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit'
+                }).replace(/\//g, '/')}</span>
+                <span className="text-gray-400">[通報]</span>
+              </div>
+              
+              {/* 投稿タイトル（最初の投稿のみ） */}
+              <h2 className="text-xl font-bold text-pink-500 mb-3">
+                {post.title}
+              </h2>
+              
+              
+              {/* 投稿内容 */}
+              <div className={`whitespace-pre-wrap break-all mb-2 ${
+                  (post.plus_count || 0) > 0 && 
+                  (post.plus_count || 0) / ((post.plus_count || 0) + (post.minus_count || 0)) > 0.7
+                    ? 'text-pink-500 text-lg font-bold'
+                    : 'text-black'
+              }`}>
+                {post.content}
+              </div>
+              
+              {/* 返信数バッジ */}
+              <div className="mb-4">
+                <div className="relative inline-block">
+                  <div className="bg-pink-400 text-white px-3 py-1 text-sm rounded">
+                    <span className="font-bold">💬 {replies.length}件の返信</span>
+                  </div>
+                  <div className="absolute -bottom-2 left-3 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-pink-400"></div>
+                </div>
+              </div>
+              
+              {/* 画像 */}
+              {post.images && post.images.length > 0 && (
+                <div className="flex gap-2 mb-4">
+                  {post.images.map((image) => (
+                    <img
+                      key={image.id}
+                      src={image.thumbnail_url || image.image_url}
+                      alt=""
+                      className="w-20 h-20 object-cover rounded cursor-pointer hover:opacity-80"
+                      onClick={() => window.open(image.image_url, '_blank')}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              {/* 投票システム */}
+              <div className="flex justify-end">
+                <div className="flex items-center gap-4">
+                  <span className="text-pink-500 font-bold">
+                    +{post.plus_count || 0}
+                  </span>
+                  <button
+                    onClick={() => handleVote('plus')}
+                    className="w-8 h-8 bg-pink-500 hover:bg-pink-600 text-white rounded flex items-center justify-center transition-colors text-lg font-bold"
+                    disabled={voting}
+                  >
+                    +
+                  </button>
+                  
+                  <div className="w-80 h-6 bg-gray-200 rounded overflow-hidden relative">
+                    {(post.plus_count || 0) + (post.minus_count || 0) > 0 ? (
+                      <>
+                        <div 
+                          className="h-full bg-pink-400 absolute left-0 top-0 transition-all duration-300"
+                          style={{
+                            width: `${((post.plus_count || 0) / ((post.plus_count || 0) + (post.minus_count || 0))) * 100}%`
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <div className="h-full bg-gray-200" />
+                    )}
+                  </div>
+                  
+                  <button
+                    onClick={() => handleVote('minus')}
+                    className="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white rounded flex items-center justify-center transition-colors text-lg font-bold"
+                    disabled={voting}
+                  >
+                    −
+                  </button>
+                  <span className="text-gray-600 font-bold">
+                    -{post.minus_count || 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 返信一覧 */}
+            <div className="space-y-4">
+              {replies.map((reply, index) => (
+                <div key={reply.id} className="border-b pb-4">
+                  {/* 返信ヘッダー */}
+                  <div className="text-sm text-gray-500 mb-2">
+                    <span className="mr-2 font-normal">{index + 2}</span>
+                    <span className="mr-2">匿名</span>
+                    <span className="mr-2">{new Date(reply.created_at).toLocaleString('ja-JP', { 
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      weekday: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                    }).replace(/\//g, '/')}</span>
+                    <span className="text-gray-400">[通報]</span>
+                  </div>
+                  
+                  {/* 返信内容 */}
+                  <div className="mb-3">
+                    <div className={`whitespace-pre-wrap break-all ${
+                        (reply.plus_count || 0) > 0 && 
+                        (reply.plus_count || 0) / ((reply.plus_count || 0) + (reply.minus_count || 0)) > 0.7
+                          ? 'text-pink-500 text-lg font-bold'
+                          : 'text-gray-800'
+                    }`}>
+                      {reply.content}
+                    </div>
+                    {/* 返信数バッジ */}
+                    {reply.replies && reply.replies.length > 0 && (
+                      <div className="mt-2">
+                        <div className="relative inline-block">
+                          <div className="bg-pink-400 text-white px-3 py-1 text-sm rounded">
+                            <span className="font-bold">💬 {reply.replies.length}件の返信</span>
+                          </div>
+                          <div className="absolute -bottom-2 left-3 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-pink-400"></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  
+                  {/* 返信の投票システム */}
+                  <div className="flex justify-end">
+                    <div className="flex items-center gap-4">
+                      <span className="text-pink-500 font-bold">
+                        +{reply.plus_count || 0}
+                      </span>
+                      <button
+                        onClick={() => handleReplyVote(reply.id, 'plus')}
+                        className="w-8 h-8 bg-pink-500 hover:bg-pink-600 text-white rounded flex items-center justify-center transition-colors text-lg font-bold"
+                        disabled={voting}
+                      >
+                        +
+                      </button>
+                      
+                      <div className="w-80 h-6 bg-gray-200 rounded overflow-hidden relative">
+                        {(reply.plus_count || 0) + (reply.minus_count || 0) > 0 ? (
+                          <>
+                            <div 
+                              className="h-full bg-pink-400 absolute left-0 top-0 transition-all duration-300"
+                              style={{
+                                width: `${((reply.plus_count || 0) / ((reply.plus_count || 0) + (reply.minus_count || 0))) * 100}%`
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <div className="h-full bg-gray-200" />
+                        )}
+                      </div>
+                      
+                      <button
+                        onClick={() => handleReplyVote(reply.id, 'minus')}
+                        className="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white rounded flex items-center justify-center transition-colors text-lg font-bold"
+                        disabled={voting}
+                      >
+                        −
+                      </button>
+                      <span className="text-gray-600 font-bold">
+                        -{reply.minus_count || 0}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 返信ボタン */}
+            <div className="text-center mt-8 mb-4">
+              <button
+                onClick={() => setShowReplyForm(true)}
+                className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded"
+              >
+                返信する
+              </button>
+            </div>
+
+            {/* レス削除依頼 */}
+            <div className="text-center text-sm text-gray-500 mb-4">
+              レスの削除依頼は、レス番号をクリックして下さい
+            </div>
+          </div>
+        </div>
+
+        {/* サイドバー */}
+        <div className="flex-[3] bg-gray-50">
+          <div className="p-4">
+            <div className="bg-gray-700 text-white p-3 rounded-t">
+              <h3 className="font-bold">その他の新着投稿</h3>
+            </div>
+            <div className="bg-white rounded-b shadow p-4">
+              <p className="text-gray-500 text-center py-8">関連投稿を表示予定</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 返信フォームモーダル */}
+      {showReplyForm && (
+        <ReplyModal
+          onClose={() => setShowReplyForm(false)}
+          onSubmit={handleReplySubmit}
+        />
+      )}
     </div>
   );
 }

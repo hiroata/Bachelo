@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { X, Upload, Mic, Play, Pause } from 'lucide-react'
+import { X, Upload, Mic, Play } from 'lucide-react'
 import { voicePostSchema } from '@/lib/validations/voice-post'
 import { handleError } from '@/lib/utils/error-handler'
 import { toast } from 'react-hot-toast'
+import { z } from 'zod'
 
 interface UploadModalProps {
   onClose: () => void
@@ -71,8 +72,8 @@ export default function UploadModal({ onClose }: UploadModalProps) {
       }
       
       voicePostSchema.parse(validationData)
-    } catch (error: any) {
-      if (error.errors && error.errors.length > 0) {
+    } catch (error: unknown) {
+      if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message)
       } else {
         toast.error('入力内容を確認してください')

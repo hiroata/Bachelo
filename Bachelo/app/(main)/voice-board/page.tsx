@@ -88,24 +88,24 @@ export default function VoiceBoardPage() {
     initialPosts: initialPosts
   })
   
-  // 初回の投稿を取得
-  const fetchInitialPosts = async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch(`/api/voice/upload?category=${activeCategory}&limit=20`)
-      const data = await response.json()
-      
-      if (data.posts) {
-        setInitialPosts(data.posts)
-      }
-    } catch (error) {
-      console.error('Failed to fetch posts:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-  
   useEffect(() => {
+    // 初回の投稿を取得
+    const fetchInitialPosts = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetch(`/api/voice/upload?category=${activeCategory}&limit=20`)
+        const data = await response.json()
+        
+        if (data.posts) {
+          setInitialPosts(data.posts)
+        }
+      } catch (error) {
+        console.error('Failed to fetch posts:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
     fetchInitialPosts()
   }, [activeCategory])
   

@@ -27,11 +27,11 @@ export async function GET() {
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
       timestamp: new Date().toISOString()
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json({
       status: 'error',
       message: 'Unexpected error',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     }, { status: 500 })
   }
 }

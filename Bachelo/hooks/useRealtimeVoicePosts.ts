@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
+import { Database } from '@/types/database'
 
 interface VoicePost {
   id: string
@@ -23,13 +24,19 @@ interface UseRealtimeVoicePostsOptions {
   initialPosts?: VoicePost[]
 }
 
+type VoicePostRow = Database['public']['Tables']['anonymous_voice_posts']['Row']
+
+interface RealtimePostPayload {
+  new: VoicePostRow
+  old?: VoicePostRow
+}
+
 export function useRealtimeVoicePosts({ category, initialPosts = [] }: UseRealtimeVoicePostsOptions = {}) {
   const [posts, setPosts] = useState<VoicePost[]>(initialPosts)
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null)
   const supabase = createClient()
 
   // 投稿データをフォーマット
-  const formatPost = useCallback((dbPost: any): VoicePost => {
+  const formatPost = useCallback((dbPost: VoicePostRow): VoicePost => {
     return {
       id: dbPost.id,
       username: dbPost.nickname,
@@ -46,13 +53,13 @@ export function useRealtimeVoicePosts({ category, initialPosts = [] }: UseRealti
   }, [])
 
   // 新規投稿を追加
-  const handleNewPost = useCallback((payload: any) => {
+  const handleNewPost = useCallback((payload: RealtimePostPayload) => {
     const newPost = formatPost(payload.new)
     setPosts(prev => [newPost, ...prev])
   }, [formatPost])
 
   // 投稿の更新（いいね数、コメント数など）
-  const handleUpdatePost = useCallback((payload: any) => {
+  const handleUpdatePost = useCallback((payload: RealtimePostPayload) => {
     const updatedPost = formatPost(payload.new)
     setPosts(prev => prev.map(post => 
       post.id === updatedPost.id ? updatedPost : post
@@ -67,7 +74,7 @@ export function useRealtimeVoicePosts({ category, initialPosts = [] }: UseRealti
     const newChannel = supabase
       .channel(channelName)
       .on(
-        'postgres_changes',
+        'postgres_changes' as any,
         {
           event: 'INSERT',
           schema: 'public',
@@ -77,7 +84,7 @@ export function useRealtimeVoicePosts({ category, initialPosts = [] }: UseRealti
         handleNewPost
       )
       .on(
-        'postgres_changes',
+        'postgres_changes' as any,
         {
           event: 'UPDATE',
           schema: 'public',
@@ -87,8 +94,6 @@ export function useRealtimeVoicePosts({ category, initialPosts = [] }: UseRealti
         handleUpdatePost
       )
       .subscribe()
-
-    setChannel(newChannel)
 
     // クリーンアップ
     return () => {

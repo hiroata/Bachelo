@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { uploadVoiceFile, getAudioDuration, validateAudioFile } from '@/lib/storage/voice-storage'
 import { hashIPAddress } from '@/lib/utils/server-utils'
 import { headers } from 'next/headers'
+import { Database } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
@@ -136,7 +137,7 @@ export async function GET(request: NextRequest) {
     }
     
     // レスポンス用にデータを整形
-    const formattedPosts = posts.map((post: any) => ({
+    const formattedPosts = posts.map((post: Database['public']['Tables']['anonymous_voice_posts']['Row']) => ({
       id: post.id,
       username: post.nickname,
       avatarEmoji: post.avatar_emoji,

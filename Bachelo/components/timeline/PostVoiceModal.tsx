@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { Button } from '@/components/ui/Button'
 import { Mic, Square, Upload, X } from 'lucide-react'
 import { Database } from '@/types/database'
+import { getErrorMessage } from '@/lib/utils/error-handler'
 
 interface PostVoiceModalProps {
   onClose: () => void
@@ -146,8 +147,8 @@ export default function PostVoiceModal({ onClose }: PostVoiceModalProps) {
       toast.success('投稿しました！')
       onClose()
       
-    } catch (error: any) {
-      toast.error(error.message || '投稿に失敗しました')
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error))
       console.error(error)
     } finally {
       setIsUploading(false)

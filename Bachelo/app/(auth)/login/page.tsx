@@ -43,8 +43,12 @@ export default function LoginPage() {
       toast.success('ログインしました')
       router.push('/dashboard')
       router.refresh()
-    } catch (error: any) {
-      toast.error(error.message || 'ログインに失敗しました')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message || 'ログインに失敗しました')
+      } else {
+        toast.error('ログインに失敗しました')
+      }
       console.error(error)
     } finally {
       setIsLoading(false)

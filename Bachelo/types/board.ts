@@ -27,6 +27,8 @@ export interface BoardPost {
   images?: BoardPostImage[];
   replies_count?: number;
   replies?: BoardReply[];
+  plus_count?: number;
+  minus_count?: number;
 }
 
 export interface BoardPostImage {
@@ -52,6 +54,8 @@ export interface BoardReply {
   created_at: string;
   updated_at: string;
   replies?: BoardReply[];
+  plus_count?: number;
+  minus_count?: number;
 }
 
 export interface CreateBoardPostInput {

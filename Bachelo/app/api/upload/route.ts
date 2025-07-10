@@ -2,6 +2,7 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { Database } from '@/types/database'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 export async function POST(request: Request) {
   const supabase = createRouteHandlerClient<Database>({ cookies })
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
 }
 
 async function handleOrderUpload(
-  supabase: any,
+  supabase: SupabaseClient<Database>,
   userId: string,
   orderId: string,
   file: File
@@ -121,7 +122,7 @@ async function handleOrderUpload(
 }
 
 async function handlePostUpload(
-  supabase: any,
+  supabase: SupabaseClient<Database>,
   userId: string,
   file: File
 ) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createRouteHandlerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 import { postRateLimiter } from '@/lib/utils/rate-limiter';
@@ -20,15 +20,14 @@ export async function GET(request: NextRequest) {
     const category_id = searchParams.get('category_id');
     const search = searchParams.get('search');
     
-    const supabase = createServerClient();
+    const supabase = createRouteHandlerClient();
     
     let query = supabase
       .from('board_posts')
       .select(`
         *,
         category:board_categories(*),
-        images:board_post_images(*),
-        replies:board_replies(count)
+        images:board_post_images(*)
       `, { count: 'exact' })
       .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false });
@@ -50,10 +49,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
     
+    // 各投稿の返信数を取得
+    const postsWithReplyCounts = await Promise.all(
+      (posts || []).map(async (post) => {
+        const { count: replyCount } = await supabase
+          .from('board_replies')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id);
+        
+        return {
+          ...post,
+          replies_count: replyCount || 0
+        };
+      })
+    );
+    
     const total_pages = Math.ceil((count || 0) / per_page);
     
     return NextResponse.json({
-      posts: posts || [],
+      posts: postsWithReplyCounts,
       total: count || 0,
       page,
       per_page,
@@ -96,7 +110,7 @@ export async function POST(request: NextRequest) {
       ALLOWED_ATTR: [],
     });
     
-    const supabase = createServerClient();
+    const supabase = createRouteHandlerClient();
     
     // ユーザーエージェントを取得
     const user_agent = request.headers.get('user-agent') || 'unknown';

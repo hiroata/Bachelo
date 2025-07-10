@@ -15,7 +15,7 @@ export class AppError extends Error {
 export interface ErrorResponse {
   error: string
   code?: string
-  details?: any
+  details?: Record<string, unknown> | string | number | boolean | null
 }
 
 /**

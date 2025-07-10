@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createRouteHandlerClient } from '@/lib/supabase/server';
 import { nanoid } from 'nanoid';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const supabase = createServerClient();
+    const supabase = createRouteHandlerClient();
     const uploadedImages = [];
     
     for (const file of files) {

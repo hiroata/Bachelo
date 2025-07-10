@@ -3,7 +3,7 @@
 const http = require('http');
 
 async function testApp() {
-  console.log('VoiceEros Application Test\n');
+  console.log('BACHELO Application Test\n');
   
   // Test 1: Mock Data API
   console.log('1. Testing Mock Data API...');

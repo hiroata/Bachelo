@@ -79,8 +79,12 @@ export default function RegisterPage() {
       
       toast.success('登録完了！メールを確認してください')
       router.push('/dashboard')
-    } catch (error: any) {
-      toast.error(error.message || '登録に失敗しました')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message || '登録に失敗しました')
+      } else {
+        toast.error('登録に失敗しました')
+      }
       console.error(error)
     } finally {
       setIsLoading(false)
