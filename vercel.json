@@ -3,6 +3,8 @@
   "outputDirectory": "Bachelo/.next",
   "installCommand": "cd Bachelo && npm install",
   "devCommand": "cd Bachelo && npm run dev",
+  "framework": "nextjs",
+  "rootDirectory": "Bachelo",
   "crons": [
     {
       "path": "/api/cleanup",
@@ -10,10 +12,10 @@
     }
   ],
   "functions": {
-    "Bachelo/app/api/voice/upload/route.ts": {
+    "app/api/voice/upload/route.ts": {
       "maxDuration": 30
     },
-    "Bachelo/app/api/board/upload/route.ts": {
+    "app/api/board/upload/route.ts": {
       "maxDuration": 30
     }
   }
