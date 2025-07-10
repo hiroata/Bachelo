@@ -10,7 +10,10 @@
     }
   ],
   "functions": {
-    "Bachelo/app/api/upload/route.ts": {
+    "Bachelo/app/api/voice/upload/route.ts": {
+      "maxDuration": 30
+    },
+    "Bachelo/app/api/board/upload/route.ts": {
       "maxDuration": 30
     }
   }
