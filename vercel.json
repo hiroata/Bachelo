@@ -1,0 +1,17 @@
+{
+  "buildCommand": "cd Bachelo && npm run build",
+  "outputDirectory": "Bachelo/.next",
+  "installCommand": "cd Bachelo && npm install",
+  "devCommand": "cd Bachelo && npm run dev",
+  "crons": [
+    {
+      "path": "/api/cleanup",
+      "schedule": "0 0 * * *"
+    }
+  ],
+  "functions": {
+    "Bachelo/app/api/upload/route.ts": {
+      "maxDuration": 30
+    }
+  }
+}
