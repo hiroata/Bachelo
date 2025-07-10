@@ -33,7 +33,7 @@ export function usePaginatedQuery<T extends keyof Tables | string>(
     enabled?: boolean;
   } = {}
 ): QueryState<{
-  items: Tables[T]['Row'][];
+  items: any[];
   totalCount: number;
   currentPage: number;
   totalPages: number;
@@ -109,7 +109,7 @@ export function useSingleQuery<T extends keyof Tables | string>(
     select?: string;
     enabled?: boolean;
   } = {}
-): QueryState<Tables[T]['Row']> {
+): QueryState<any> {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -154,9 +154,9 @@ export function useRealtimeSubscription<T extends keyof Tables | string>(
   options: {
     event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
     filter?: string;
-    onInsert?: (payload: Tables[T]['Row']) => void;
-    onUpdate?: (payload: Tables[T]['Row']) => void;
-    onDelete?: (payload: Tables[T]['Row']) => void;
+    onInsert?: (payload: any) => void;
+    onUpdate?: (payload: any) => void;
+    onDelete?: (payload: any) => void;
   } = {}
 ) {
   const { event = '*', filter, onInsert, onUpdate, onDelete } = options;
@@ -286,7 +286,7 @@ export function useMutation<T extends keyof Tables | string>() {
 
   const create = useCallback(async (
     tableName: T,
-    data: Omit<Tables[T]['Insert'], 'id' | 'created_at' | 'updated_at'>
+    data: any
   ) => {
     setLoading(true);
     setError(null);
@@ -311,7 +311,7 @@ export function useMutation<T extends keyof Tables | string>() {
   const update = useCallback(async (
     tableName: T,
     id: string,
-    data: Partial<Tables[T]['Update']>
+    data: any
   ) => {
     setLoading(true);
     setError(null);

@@ -88,7 +88,7 @@ export async function getById<T extends keyof Tables | string>(
  */
 export async function create<T extends keyof Tables | string>(
   tableName: T,
-  data: Omit<Tables[T]['Insert'], 'id' | 'created_at' | 'updated_at'>
+  data: any
 ) {
   const supabase = createRouteHandlerClient()
 
@@ -108,7 +108,7 @@ export async function create<T extends keyof Tables | string>(
 export async function update<T extends keyof Tables | string>(
   tableName: T,
   id: string,
-  data: Partial<Tables[T]['Update']>
+  data: any
 ) {
   const supabase = createRouteHandlerClient()
 
