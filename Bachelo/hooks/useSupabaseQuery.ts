@@ -270,8 +270,7 @@ export function useVoicePosts(
   useRealtimeSubscription('anonymous_voice_posts', {
     filter: category ? `category=eq.${category}` : undefined,
     onInsert: () => refetch(),
-    onUpdate: () => refetch(),
-    enabled: options.realtime
+    onUpdate: () => refetch()
   });
 
   return { posts: data?.items || [], loading, error, refetch };
