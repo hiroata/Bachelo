@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { RealtimeChannel } from '@supabase/supabase-js'
+import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 
 interface VoicePost {
@@ -26,10 +26,7 @@ interface UseRealtimeVoicePostsOptions {
 
 type VoicePostRow = Database['public']['Tables']['anonymous_voice_posts']['Row']
 
-interface RealtimePostPayload {
-  new: VoicePostRow
-  old?: VoicePostRow
-}
+type RealtimePostPayload = RealtimePostgresChangesPayload<VoicePostRow>
 
 export function useRealtimeVoicePosts({ category, initialPosts = [] }: UseRealtimeVoicePostsOptions = {}) {
   const [posts, setPosts] = useState<VoicePost[]>(initialPosts)
@@ -54,16 +51,20 @@ export function useRealtimeVoicePosts({ category, initialPosts = [] }: UseRealti
 
   // 新規投稿を追加
   const handleNewPost = useCallback((payload: RealtimePostPayload) => {
-    const newPost = formatPost(payload.new)
-    setPosts(prev => [newPost, ...prev])
+    if (payload.new && 'id' in payload.new) {
+      const newPost = formatPost(payload.new as VoicePostRow)
+      setPosts(prev => [newPost, ...prev])
+    }
   }, [formatPost])
 
   // 投稿の更新（いいね数、コメント数など）
   const handleUpdatePost = useCallback((payload: RealtimePostPayload) => {
-    const updatedPost = formatPost(payload.new)
-    setPosts(prev => prev.map(post => 
-      post.id === updatedPost.id ? updatedPost : post
-    ))
+    if (payload.new && 'id' in payload.new) {
+      const updatedPost = formatPost(payload.new as VoicePostRow)
+      setPosts(prev => prev.map(post => 
+        post.id === updatedPost.id ? updatedPost : post
+      ))
+    }
   }, [formatPost])
 
   // リアルタイム接続をセットアップ
@@ -74,24 +75,24 @@ export function useRealtimeVoicePosts({ category, initialPosts = [] }: UseRealti
     const newChannel = supabase
       .channel(channelName)
       .on(
-        'postgres_changes' as any,
+        'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'anonymous_voice_posts',
           filter: category ? `category=eq.${category}` : undefined
         },
-        handleNewPost
+        (payload: RealtimePostPayload) => handleNewPost(payload)
       )
       .on(
-        'postgres_changes' as any,
+        'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
           table: 'anonymous_voice_posts',
           filter: category ? `category=eq.${category}` : undefined
         },
-        handleUpdatePost
+        (payload: RealtimePostPayload) => handleUpdatePost(payload)
       )
       .subscribe()
 

@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       
       // データベースに保存
       if (postId) {
-        const insertData: any = {
+        const insertData = {
             post_id: postId,
             image_url: publicUrl,
             file_size: file.size,

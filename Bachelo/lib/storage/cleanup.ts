@@ -88,7 +88,7 @@ export async function cleanupExpiredContent() {
 }
 
 // ストレージ使用量を取得
-export async function getStorageUsage(supabase: any) {
+export async function getStorageUsage(supabase: ReturnType<typeof createClient<Database>>) {
   try {
     // 各バケットのファイルリストを取得
     const buckets = ['audio']

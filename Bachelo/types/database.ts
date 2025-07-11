@@ -338,6 +338,213 @@ export interface Database {
           created_at?: string
         }
       }
+      board_categories: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          description: string | null
+          display_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          description?: string | null
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          description?: string | null
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      board_posts: {
+        Row: {
+          id: string
+          category_id: string
+          author_name: string
+          author_email: string | null
+          title: string
+          content: string
+          view_count: number
+          is_pinned: boolean
+          is_locked: boolean
+          ip_address: string | null
+          user_agent: string | null
+          plus_count: number
+          minus_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          category_id: string
+          author_name: string
+          author_email?: string | null
+          title: string
+          content: string
+          view_count?: number
+          is_pinned?: boolean
+          is_locked?: boolean
+          ip_address?: string | null
+          user_agent?: string | null
+          plus_count?: number
+          minus_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          category_id?: string
+          author_name?: string
+          author_email?: string | null
+          title?: string
+          content?: string
+          view_count?: number
+          is_pinned?: boolean
+          is_locked?: boolean
+          ip_address?: string | null
+          user_agent?: string | null
+          plus_count?: number
+          minus_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      board_post_images: {
+        Row: {
+          id: string
+          post_id: string
+          image_url: string
+          thumbnail_url: string | null
+          file_size: number | null
+          mime_type: string | null
+          display_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          image_url: string
+          thumbnail_url?: string | null
+          file_size?: number | null
+          mime_type?: string | null
+          display_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          image_url?: string
+          thumbnail_url?: string | null
+          file_size?: number | null
+          mime_type?: string | null
+          display_order?: number
+          created_at?: string
+        }
+      }
+      board_replies: {
+        Row: {
+          id: string
+          post_id: string
+          parent_reply_id: string | null
+          author_name: string
+          author_email: string | null
+          content: string
+          ip_address: string | null
+          user_agent: string | null
+          plus_count: number
+          minus_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          parent_reply_id?: string | null
+          author_name: string
+          author_email?: string | null
+          content: string
+          ip_address?: string | null
+          user_agent?: string | null
+          plus_count?: number
+          minus_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          parent_reply_id?: string | null
+          author_name?: string
+          author_email?: string | null
+          content?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          plus_count?: number
+          minus_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      board_post_votes: {
+        Row: {
+          id: string
+          post_id: string
+          ip_address: string
+          vote_type: 'plus' | 'minus'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          ip_address: string
+          vote_type: 'plus' | 'minus'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          ip_address?: string
+          vote_type?: 'plus' | 'minus'
+          created_at?: string
+        }
+      }
+      board_reply_votes: {
+        Row: {
+          id: string
+          reply_id: string
+          ip_address: string
+          vote_type: 'plus' | 'minus'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          reply_id: string
+          ip_address: string
+          vote_type: 'plus' | 'minus'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          reply_id?: string
+          ip_address?: string
+          vote_type?: 'plus' | 'minus'
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

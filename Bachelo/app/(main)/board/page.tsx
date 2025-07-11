@@ -243,7 +243,7 @@ function BoardContent() {
                         )}
                         <div className="flex items-center gap-1">
                           <MessageCircle className="w-4 h-4" />
-                          <span>{post.reply_count || 0}</span>
+                          <span>{post.replies_count || 0}</span>
                         </div>
                       </div>
                     </div>

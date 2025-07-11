@@ -27,7 +27,7 @@ export class SupabaseError extends Error {
   constructor(
     public type: SupabaseErrorType,
     public message: string,
-    public originalError?: any,
+    public originalError?: PostgrestError | Error | unknown,
     public statusCode: number = 500
   ) {
     super(message);
@@ -130,8 +130,8 @@ export function parseSupabaseError(error: PostgrestError | Error): SupabaseError
 /**
  * APIルートでのエラーハンドリング
  */
-export function handleSupabaseError(error: any): NextResponse {
-  const supabaseError = parseSupabaseError(error);
+export function handleSupabaseError(error: PostgrestError | Error | unknown): NextResponse {
+  const supabaseError = parseSupabaseError(error as PostgrestError | Error);
   
   // 開発環境では詳細なエラー情報を含める
   const isDev = process.env.NODE_ENV === 'development';
@@ -183,17 +183,18 @@ export async function withSupabaseErrorHandling<T>(
 /**
  * フロントエンド用のエラーメッセージ取得
  */
-export function getErrorMessage(error: any): string {
+export function getErrorMessage(error: SupabaseError | Error | unknown): string {
   if (error instanceof SupabaseError) {
     return error.message;
   }
   
-  if (error?.error?.message) {
-    return error.error.message;
+  if (error && typeof error === 'object' && 'error' in error && 
+      typeof error.error === 'object' && error.error && 'message' in error.error) {
+    return (error.error as { message: string }).message;
   }
   
-  if (error?.message) {
-    return error.message;
+  if (error && typeof error === 'object' && 'message' in error) {
+    return (error as { message: string }).message;
   }
   
   return 'エラーが発生しました。';
@@ -202,14 +203,14 @@ export function getErrorMessage(error: any): string {
 /**
  * エラーのトースト表示用ヘルパー
  */
-export function getToastMessage(error: any): {
+export function getToastMessage(error: SupabaseError | Error | unknown): {
   title: string;
   description: string;
   type: 'error' | 'warning';
 } {
   const supabaseError = error instanceof SupabaseError 
     ? error 
-    : parseSupabaseError(error);
+    : parseSupabaseError(error as Error);
   
   switch (supabaseError.type) {
     case SupabaseErrorType.PERMISSION_DENIED:

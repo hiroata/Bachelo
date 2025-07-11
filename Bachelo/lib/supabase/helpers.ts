@@ -19,7 +19,7 @@ export async function getPaginated<T extends keyof Tables | string>(
     perPage?: number
     orderBy?: string
     ascending?: boolean
-    filters?: Record<string, any>
+    filters?: Record<string, string | number | boolean | null>
   } = {}
 ) {
   const {
@@ -86,9 +86,9 @@ export async function getById<T extends keyof Tables | string>(
 /**
  * レコードを作成
  */
-export async function create<T extends keyof Tables | string>(
+export async function create<T extends keyof Tables>(
   tableName: T,
-  data: any
+  data: T extends keyof Tables ? Tables[T]['Insert'] : never
 ) {
   const supabase = createRouteHandlerClient()
 
@@ -105,10 +105,10 @@ export async function create<T extends keyof Tables | string>(
 /**
  * レコードを更新
  */
-export async function update<T extends keyof Tables | string>(
+export async function update<T extends keyof Tables>(
   tableName: T,
   id: string,
-  data: any
+  data: T extends keyof Tables ? Tables[T]['Update'] : never
 ) {
   const supabase = createRouteHandlerClient()
 
@@ -246,7 +246,7 @@ export async function updateReplyCount(postId: string) {
 
   await supabase
     .from('board_posts')
-    .update({ reply_count: count || 0 })
+    .update({ replies_count: count || 0 })
     .eq('id', postId)
 
   return count || 0
