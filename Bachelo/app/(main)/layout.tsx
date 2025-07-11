@@ -18,7 +18,6 @@ export default function MainLayout({
 
   const navigation = [
     { name: '掲示板', href: '/board', icon: MessageSquare },
-    { name: '音声掲示板', href: '/voice-board', icon: Mic },
     { name: 'クリエイター', href: '/creators', icon: User },
     ...(user ? [{ name: 'ダッシュボード', href: '/dashboard', icon: Home }] : []),
   ]
@@ -172,11 +171,6 @@ export default function MainLayout({
             <div>
               <h4 className="text-lg font-semibold mb-4">サービス</h4>
               <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/voice-board" className="text-gray-400 hover:text-white transition-colors">
-                    音声掲示板
-                  </Link>
-                </li>
                 <li>
                   <Link href="/board" className="text-gray-400 hover:text-white transition-colors">
                     掲示板
