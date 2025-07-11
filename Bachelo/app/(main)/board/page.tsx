@@ -242,7 +242,12 @@ function BoardContent() {
                 {categories.slice(0, 8).map(category => {
                   // 地域カテゴリーの場合は特別な処理
                   const isRegional = category.slug === 'region' || category.slug === 'regional';
-                  const href = isRegional ? '/board/regional' : `/board?category=${category.id}`;
+                  // 体験談カテゴリーの場合は特別な処理
+                  const isExperience = category.slug === 'confession' || category.slug === 'experience';
+                  
+                  const href = isRegional ? '/board/regional' : 
+                              isExperience ? '/board/experience' :
+                              `/board?category=${category.id}`;
                   
                   return (
                     <Link
@@ -272,7 +277,12 @@ function BoardContent() {
                   {categories.slice(8).map(category => {
                     // 地域カテゴリーの場合は特別な処理
                     const isRegional = category.slug === 'region' || category.slug === 'regional';
-                    const href = isRegional ? '/board/regional' : `/board?category=${category.id}`;
+                    // 体験談カテゴリーの場合は特別な処理
+                    const isExperience = category.slug === 'confession' || category.slug === 'experience';
+                    
+                    const href = isRegional ? '/board/regional' : 
+                                isExperience ? '/board/experience' :
+                                `/board?category=${category.id}`;
                     
                     return (
                       <Link
