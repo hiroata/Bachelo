@@ -11,3 +11,6 @@ export const createRouteHandlerClient = () => {
   const cookieStore = cookies()
   return createSupabaseRouteHandlerClient<Database>({ cookies: () => cookieStore })
 }
+
+// Alias for backward compatibility
+export const createClient = createRouteHandlerClient
