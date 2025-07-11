@@ -5,6 +5,7 @@ export interface BoardCategory {
   description?: string;
   display_order: number;
   is_active: boolean;
+  icon?: string;
   created_at: string;
   updated_at: string;
 }

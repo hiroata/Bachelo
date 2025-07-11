@@ -3,6 +3,10 @@ import { createRouteHandlerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 import { postRateLimiter } from '@/lib/utils/rate-limiter';
+import crypto from 'crypto';
+import { checkNgWords, logNgWordDetection } from '@/lib/utils/ng-word-checker';
+
+export const dynamic = 'force-dynamic';
 
 const createPostSchema = z.object({
   category_id: z.string().uuid(),
@@ -85,11 +89,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // レート制限チェック
-    const ip_address = request.headers.get('x-forwarded-for') || 
-                      request.headers.get('x-real-ip') || 
-                      'unknown';
+    const forwarded = request.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'unknown';
     
-    if (!postRateLimiter.isAllowed(ip_address)) {
+    if (!postRateLimiter.isAllowed(ip)) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
         { status: 429 }
@@ -110,6 +113,40 @@ export async function POST(request: NextRequest) {
       ALLOWED_ATTR: [],
     });
     
+    // IPアドレスをハッシュ化
+    const ipHash = crypto.createHash('sha256').update(ip).digest('hex');
+    
+    // NGワードチェック
+    const titleCheck = await checkNgWords(sanitizedTitle);
+    const contentCheck = await checkNgWords(sanitizedContent);
+    
+    // タイトルまたは本文にNGワードが含まれている場合
+    if (!titleCheck.isClean || !contentCheck.isClean) {
+      const allDetectedWords = [...titleCheck.detectedWords, ...contentCheck.detectedWords];
+      const highestSeverity = titleCheck.highestSeverity || contentCheck.highestSeverity;
+      
+      // 重大なNGワードが含まれている場合は投稿を拒否
+      if (titleCheck.shouldBlock || contentCheck.shouldBlock) {
+        // NGワード検出をログに記録
+        await logNgWordDetection(
+          'board_post',
+          'blocked', // まだIDがないので一時的な値
+          allDetectedWords.map(w => w.word),
+          highestSeverity!,
+          'blocked',
+          ipHash
+        );
+        
+        return NextResponse.json(
+          { 
+            error: '禁止されている言葉が含まれています。内容を修正してください。',
+            code: 'NG_WORD_DETECTED'
+          },
+          { status: 400 }
+        );
+      }
+    }
+    
     const supabase = createRouteHandlerClient();
     
     // ユーザーエージェントを取得
@@ -121,7 +158,7 @@ export async function POST(request: NextRequest) {
         ...validatedData,
         title: sanitizedTitle,
         content: sanitizedContent,
-        ip_address,
+        ip_address: ipHash,
         user_agent,
       })
       .select(`
@@ -132,6 +169,21 @@ export async function POST(request: NextRequest) {
     
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    
+    // 軽度のNGワードが検出された場合はログに記録（投稿は許可）
+    if (!titleCheck.isClean || !contentCheck.isClean) {
+      const allDetectedWords = [...titleCheck.detectedWords, ...contentCheck.detectedWords];
+      const highestSeverity = titleCheck.highestSeverity || contentCheck.highestSeverity;
+      
+      await logNgWordDetection(
+        'board_post',
+        post.id,
+        allDetectedWords.map(w => w.word),
+        highestSeverity!,
+        'flagged',
+        ipHash
+      );
     }
     
     return NextResponse.json(post, { status: 201 });

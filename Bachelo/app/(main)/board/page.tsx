@@ -3,9 +3,12 @@
 import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Crown, MessageCircle, Plus, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Crown, MessageCircle, Plus, ChevronLeft, ChevronRight, Search, Trash2, AlertTriangle } from 'lucide-react';
 import { BoardPost, BoardCategory } from '@/types/board';
 import PostModal from '@/components/board/PostModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { ReportModal } from '@/components/ui/ReportModal';
+import { toast } from 'react-hot-toast';
 
 function BoardContent() {
   const searchParams = useSearchParams();
@@ -24,16 +27,50 @@ function BoardContent() {
   const [totalPosts, setTotalPosts] = useState(0);
   const postsPerPage = 20;
 
+  // 削除関連の状態
+  const [deletePostId, setDeletePostId] = useState<string | null>(null);
+  const [deletingPost, setDeletingPost] = useState(false);
+  
+  // 通報関連の状態
+  const [reportPostId, setReportPostId] = useState<string | null>(null);
+
   // カテゴリー取得
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch('/api/board/categories');
-        if (!response.ok) throw new Error('Failed to fetch categories');
+        if (!response.ok) {
+          console.error('Failed to fetch categories:', response.status);
+          // テーブルが存在しない可能性があるので、自動セットアップを試みる
+          if (response.status === 500) {
+            console.log('🔧 掲示板のセットアップを試みます...');
+            const setupResponse = await fetch('/api/setup/board');
+            if (setupResponse.ok) {
+              console.log('✅ セットアップ完了！カテゴリーを再取得します...');
+              // セットアップ後に再度カテゴリーを取得
+              const retryResponse = await fetch('/api/board/categories');
+              if (retryResponse.ok) {
+                const retryData = await retryResponse.json();
+                if (Array.isArray(retryData)) {
+                  setCategories(retryData);
+                  return;
+                }
+              }
+            }
+          }
+          return;
+        }
         const data = await response.json();
-        setCategories(data);
+        // Ensure data is an array
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else {
+          console.error('Categories response is not an array:', data);
+          setCategories([]);
+        }
       } catch (error) {
         console.error('Error fetching categories:', error);
+        setCategories([]);
       }
     };
     fetchCategories();
@@ -123,6 +160,41 @@ function BoardContent() {
     return date.toLocaleDateString('ja-JP');
   };
 
+  // 投稿が削除可能かチェック（30分以内）
+  const canDeletePost = (post: BoardPost) => {
+    const createdAt = new Date(post.created_at);
+    const now = new Date();
+    const diffMinutes = (now.getTime() - createdAt.getTime()) / (1000 * 60);
+    return diffMinutes <= 30;
+  };
+
+  // 投稿削除処理
+  const handleDeletePost = async () => {
+    if (!deletePostId) return;
+    
+    setDeletingPost(true);
+    try {
+      const response = await fetch(`/api/board/posts/${deletePostId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || '削除に失敗しました');
+      }
+
+      toast.success('投稿を削除しました');
+      setDeletePostId(null);
+      // 投稿一覧を再取得
+      fetchPosts();
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast.error(error instanceof Error ? error.message : '削除に失敗しました');
+    } finally {
+      setDeletingPost(false);
+    }
+  };
+
   return (
     <>
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -152,30 +224,62 @@ function BoardContent() {
           </div>
 
           {/* カテゴリータブ */}
-          <div className="flex gap-2 flex-wrap">
-            <Link
-              href="/board"
-              className={`px-4 py-2 rounded-lg transition ${
-                !categoryId 
-                  ? 'bg-pink-500 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              すべて
-            </Link>
-            {categories.map(category => (
-              <Link
-                key={category.id}
-                href={`/board?category=${category.id}`}
-                className={`px-4 py-2 rounded-lg transition ${
-                  categoryId === category.id 
-                    ? 'bg-pink-500 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {category.name}
-              </Link>
-            ))}
+          <div className="space-y-3">
+            {/* 人気カテゴリー */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-600 mb-2">人気カテゴリー</h3>
+              <div className="flex gap-2 flex-wrap">
+                <Link
+                  href="/board"
+                  className={`px-4 py-2 rounded-lg transition text-sm ${
+                    !categoryId 
+                      ? 'bg-pink-500 text-white' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  すべて
+                </Link>
+                {categories.slice(0, 8).map(category => (
+                  <Link
+                    key={category.id}
+                    href={`/board?category=${category.id}`}
+                    className={`px-4 py-2 rounded-lg transition text-sm flex items-center gap-1 ${
+                      categoryId === category.id 
+                        ? 'bg-pink-500 text-white' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {category.icon && <span>{category.icon}</span>}
+                    {category.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            
+            {/* その他のカテゴリー */}
+            {categories.length > 8 && (
+              <details className="group">
+                <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
+                  その他のカテゴリー ({categories.length - 8}件) ▼
+                </summary>
+                <div className="mt-2 flex gap-2 flex-wrap">
+                  {categories.slice(8).map(category => (
+                    <Link
+                      key={category.id}
+                      href={`/board?category=${category.id}`}
+                      className={`px-4 py-2 rounded-lg transition text-sm flex items-center gap-1 ${
+                        categoryId === category.id 
+                          ? 'bg-pink-500 text-white' 
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {category.icon && <span>{category.icon}</span>}
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
+              </details>
+            )}
           </div>
         </div>
 
@@ -237,7 +341,8 @@ function BoardContent() {
                         <span>{post.author_name}</span>
                         <span>{formatDate(post.created_at)}</span>
                         {post.category && (
-                          <span className="bg-gray-100 px-2 py-1 rounded">
+                          <span className="bg-gray-100 px-2 py-1 rounded inline-flex items-center gap-1">
+                            {post.category.icon && <span>{post.category.icon}</span>}
                             {post.category.name}
                           </span>
                         )}
@@ -248,7 +353,7 @@ function BoardContent() {
                       </div>
                     </div>
                     
-                    {/* 投票ボタン */}
+                    {/* 投票ボタンと削除ボタン */}
                     <div className="flex items-center gap-2 ml-4">
                       <button
                         onClick={() => handleVote(post.id, 'plus')}
@@ -264,26 +369,51 @@ function BoardContent() {
                         <span>-</span>
                         <span>{post.minus_count || 0}</span>
                       </button>
+                      {canDeletePost(post) && (
+                        <button
+                          onClick={() => setDeletePostId(post.id)}
+                          className="flex items-center gap-1 px-3 py-1 rounded bg-gray-50 text-gray-600 hover:bg-gray-100 transition"
+                          title="削除"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setReportPostId(post.id)}
+                        className="flex items-center gap-1 px-3 py-1 rounded bg-orange-50 text-orange-600 hover:bg-orange-100 transition"
+                        title="通報"
+                      >
+                        <AlertTriangle className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                   
                   {/* 画像プレビュー */}
                   {post.images && post.images.length > 0 && (
-                    <div className="flex gap-2 mt-4">
-                      {post.images.slice(0, 3).map((image, idx) => (
-                        <div key={idx} className="relative w-20 h-20">
-                          <img
-                            src={image.thumbnail_url || image.image_url}
-                            alt=""
-                            className="w-full h-full object-cover rounded"
-                          />
-                        </div>
-                      ))}
-                      {post.images.length > 3 && (
-                        <div className="w-20 h-20 bg-gray-100 rounded flex items-center justify-center text-gray-600">
-                          +{post.images.length - 3}
-                        </div>
-                      )}
+                    <div className="mt-4">
+                      <div className="flex gap-2 flex-wrap">
+                        {post.images.slice(0, 4).map((image, idx) => (
+                          <div key={idx} className="relative group cursor-pointer">
+                            <div className="w-32 h-32 overflow-hidden rounded-lg bg-gray-100">
+                              <img
+                                src={image.thumbnail_url || image.image_url}
+                                alt={`画像${idx + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              />
+                            </div>
+                            {/* ホバー時の拡大プレビュー */}
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity rounded-lg"></div>
+                            {idx === 3 && post.images.length > 4 && (
+                              <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center text-white font-bold">
+                                +{post.images.length - 4}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        画像 {post.images.length}枚
+                      </p>
                     </div>
                   )}
                 </div>
@@ -352,6 +482,28 @@ function BoardContent() {
             fetchPosts();
           }}
           categories={categories}
+        />
+      )}
+
+      {/* 削除確認ダイアログ */}
+      <ConfirmDialog
+        isOpen={!!deletePostId}
+        onClose={() => setDeletePostId(null)}
+        onConfirm={handleDeletePost}
+        title="投稿を削除"
+        message="この投稿を削除してもよろしいですか？削除後は元に戻せません。"
+        confirmText="削除"
+        cancelText="キャンセル"
+        isLoading={deletingPost}
+      />
+      
+      {/* 通報モーダル */}
+      {reportPostId && (
+        <ReportModal
+          isOpen={!!reportPostId}
+          onClose={() => setReportPostId(null)}
+          contentType="board_post"
+          contentId={reportPostId}
         />
       )}
     </>

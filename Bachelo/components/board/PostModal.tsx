@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { BoardCategory } from '@/types/board';
 import { toast } from 'react-hot-toast';
+import { X, Image as ImageIcon, Upload } from 'lucide-react';
 
 interface PostModalProps {
   categories: BoardCategory[];
@@ -23,12 +24,79 @@ export default function PostModal({
     content: '',
   });
   const [loading, setLoading] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 画像選択処理
+  const handleImageSelect = (files: FileList | null) => {
+    if (!files) return;
+
+    const newFiles = Array.from(files);
+    const validFiles = newFiles.filter(file => {
+      const isValid = file.type.startsWith('image/');
+      const isUnder5MB = file.size <= 5 * 1024 * 1024;
+      
+      if (!isValid) {
+        toast.error(`${file.name}は画像ファイルではありません`);
+      }
+      if (!isUnder5MB) {
+        toast.error(`${file.name}は5MBを超えています`);
+      }
+      
+      return isValid && isUnder5MB;
+    });
+
+    // 最大4枚まで
+    const remainingSlots = 4 - selectedImages.length;
+    const filesToAdd = validFiles.slice(0, remainingSlots);
+    
+    if (validFiles.length > remainingSlots) {
+      toast.error('画像は最大4枚までです');
+    }
+
+    // プレビュー生成
+    filesToAdd.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    setSelectedImages(prev => [...prev, ...filesToAdd]);
+  };
+
+  // 画像削除処理
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // ドラッグ&ドロップ処理
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    handleImageSelect(e.dataTransfer.files);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // まず投稿を作成
       const response = await fetch('/api/board/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,6 +105,27 @@ export default function PostModal({
 
       if (!response.ok) {
         throw new Error('Failed to create post');
+      }
+
+      const post = await response.json();
+
+      // 画像がある場合はアップロード
+      if (selectedImages.length > 0) {
+        const uploadFormData = new FormData();
+        uploadFormData.append('post_id', post.id);
+        selectedImages.forEach(image => {
+          uploadFormData.append('files', image);
+        });
+
+        const uploadResponse = await fetch('/api/board/upload', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+
+        if (!uploadResponse.ok) {
+          console.error('画像のアップロードに失敗しました');
+          // 画像アップロードが失敗しても投稿自体は成功しているので続行
+        }
       }
 
       toast.success('投稿が作成されました');
@@ -113,7 +202,7 @@ export default function PostModal({
                   >
                     {categories.map((category) => (
                       <option key={category.id} value={category.id}>
-                        {category.name}
+                        {category.icon ? `${category.icon} ${category.name}` : category.name}
                       </option>
                     ))}
                   </select>
@@ -130,6 +219,70 @@ export default function PostModal({
                     required
                     style={{ backgroundColor: '#FFE4E1' }}
                   />
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-3 pr-4 text-right font-bold align-top">画像</td>
+                <td className="py-3">
+                  {/* ドラッグ&ドロップエリア */}
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                      isDragging 
+                        ? 'border-pink-500 bg-pink-50' 
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => handleImageSelect(e.target.files)}
+                      className="hidden"
+                    />
+                    <Upload className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                    <p className="text-gray-600 mb-2">
+                      画像をドラッグ&ドロップ または
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-4 py-2 bg-pink-100 text-pink-600 rounded hover:bg-pink-200 transition"
+                    >
+                      ファイルを選択
+                    </button>
+                    <p className="text-sm text-gray-500 mt-2">
+                      最大4枚まで、各5MB以下
+                    </p>
+                  </div>
+
+                  {/* 画像プレビュー */}
+                  {imagePreviews.length > 0 && (
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      {imagePreviews.map((preview, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={preview}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                          <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                            {selectedImages[index]?.name}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </td>
               </tr>
             </tbody>

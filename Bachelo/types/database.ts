@@ -346,6 +346,7 @@ export interface Database {
           description: string | null
           display_order: number
           is_active: boolean
+          icon: string | null
           created_at: string
           updated_at: string
         }
@@ -356,6 +357,7 @@ export interface Database {
           description?: string | null
           display_order?: number
           is_active?: boolean
+          icon?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -366,6 +368,7 @@ export interface Database {
           description?: string | null
           display_order?: number
           is_active?: boolean
+          icon?: string | null
           created_at?: string
           updated_at?: string
         }

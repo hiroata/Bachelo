@@ -1,19 +1,25 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { BoardPost, BoardReply, CreateBoardReplyInput } from '@/types/board';
 import ReplyModal from '@/components/board/ReplyModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { toast } from 'react-hot-toast';
+import { Trash2 } from 'lucide-react';
 
 export default function PostDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const postId = params.id as string;
   const [post, setPost] = useState<BoardPost | null>(null);
   const [replies, setReplies] = useState<BoardReply[]>([]);
   const [loading, setLoading] = useState(true);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [voting, setVoting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletingPost, setDeletingPost] = useState(false);
 
   const fetchPostDetails = useCallback(async () => {
     setLoading(true);
@@ -117,6 +123,40 @@ export default function PostDetailPage() {
     }
   };
 
+  // 投稿が削除可能かチェック（30分以内）
+  const canDeletePost = () => {
+    if (!post) return false;
+    const createdAt = new Date(post.created_at);
+    const now = new Date();
+    const diffMinutes = (now.getTime() - createdAt.getTime()) / (1000 * 60);
+    return diffMinutes <= 30;
+  };
+
+  // 投稿削除処理
+  const handleDeletePost = async () => {
+    setDeletingPost(true);
+    try {
+      const response = await fetch(`/api/board/posts/${postId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || '削除に失敗しました');
+      }
+
+      toast.success('投稿を削除しました');
+      setShowDeleteDialog(false);
+      // 掲示板一覧に戻る
+      router.push('/board');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast.error(error instanceof Error ? error.message : '削除に失敗しました');
+    } finally {
+      setDeletingPost(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: '#E8E8E8' }}>
@@ -159,10 +199,21 @@ export default function PostDetailPage() {
             </div>
 
             {/* スレッドタイトル */}
-            <h1 className="text-2xl font-bold mb-4 pb-4 border-b">
-              {post.is_pinned && <span className="text-red-500 mr-2">📌</span>}
-              {post.title}
-            </h1>
+            <div className="flex items-center justify-between mb-4 pb-4 border-b">
+              <h1 className="text-2xl font-bold">
+                {post.is_pinned && <span className="text-red-500 mr-2">📌</span>}
+                {post.title}
+              </h1>
+              {canDeletePost() && (
+                <button
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded transition"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  削除
+                </button>
+              )}
+            </div>
 
             {/* 最初の投稿 */}
             <div className="mb-6">
@@ -392,6 +443,18 @@ export default function PostDetailPage() {
           onSubmit={handleReplySubmit}
         />
       )}
+
+      {/* 削除確認ダイアログ */}
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDeletePost}
+        title="投稿を削除"
+        message="この投稿を削除してもよろしいですか？削除後は元に戻せません。"
+        confirmText="削除"
+        cancelText="キャンセル"
+        isLoading={deletingPost}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
-# BACHELO - アダルトボイスマーケットプレイスMVP
+# BACHELO - アダルトボイスマーケットプレイス & 匿名掲示板
 
-アダルトボイス特化型のオーダーメイドマーケットプレイスです。
+アダルトボイス特化型のオーダーメイドマーケットプレイス + 5ch風匿名掲示板機能
 
 ## 技術スタック
 
@@ -11,42 +11,59 @@
 - **Authentication**: Supabase Auth
 - **Deployment**: Vercel
 
-## セットアップ
+## 🚀 超簡単セットアップ（3分で完了！）
 
 ### 1. 環境変数の設定
 
-`.env.local.example`を`.env.local`にコピーして、以下の環境変数を設定：
+`.env.local`ファイルを作成して、以下を設定：
 
 ```bash
-cp .env.local.example .env.local
+NEXT_PUBLIC_SUPABASE_URL=あなたのSupabaseURL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=あなたの公開キー
 ```
 
-必要な環境変数：
-- `NEXT_PUBLIC_SUPABASE_URL`: SupabaseプロジェクトのURL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabaseの匿名キー
-- `SUPABASE_SERVICE_ROLE_KEY`: Supabaseのサービスロールキー
-- `PAYMENT_API_KEY`: 決済APIキー（MVP版では使用しない）
-- `CRON_SECRET`: Cronジョブ用のシークレット
-
-### 2. Supabaseのセットアップ
-
-1. [Supabase](https://app.supabase.com)で新規プロジェクトを作成
-2. SQLエディタで`supabase/schema.sql`の内容を実行
-3. Storageで`audio`バケットを作成（Publicにはしない）
-
-### 3. 依存関係のインストール
+### 2. アプリを起動して掲示板にアクセス
 
 ```bash
 npm install
-```
-
-### 4. 開発サーバーの起動
-
-```bash
 npm run dev
 ```
 
-http://localhost:3000 でアプリケーションが起動します。
+ブラウザで http://localhost:3000/board にアクセスすると、**自動でセットアップが完了します！** 🎉
+
+### 3. Supabaseの初期設定（初回のみ）
+
+掲示板機能を使うには、Supabaseで以下のSQLを一度だけ実行：
+
+```sql
+-- 掲示板の基本テーブル（これだけでOK！）
+CREATE TABLE IF NOT EXISTS board_categories (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  slug VARCHAR(50) NOT NULL UNIQUE,
+  description TEXT,
+  display_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS board_posts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  category_id UUID REFERENCES board_categories(id),
+  author_name VARCHAR(100) NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  content TEXT NOT NULL,
+  plus_count INTEGER DEFAULT 0,
+  minus_count INTEGER DEFAULT 0,
+  replies_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- セキュリティを一時的に無効化（開発用）
+ALTER TABLE board_categories DISABLE ROW LEVEL SECURITY;
+ALTER TABLE board_posts DISABLE ROW LEVEL SECURITY;
+```
+
 
 ## デプロイ
 
@@ -63,6 +80,13 @@ vercel --prod
 
 ## 主な機能
 
+### 🔥 NEW! 匿名掲示板機能
+- **5ch風インターフェース**: 誰でも気軽に投稿
+- **カテゴリー別投稿**: 雑談、質問、ニュースなど
+- **投票システム**: 投稿への評価（+/-ボタン）
+- **自動セットアップ**: 面倒な設定不要！
+
+### 🎤 音声マーケットプレイス
 - **年齢確認**: 18歳以上のみ利用可能
 - **ユーザー登録**: クリエイター/クライアントの2種類
 - **クリエイター機能**:

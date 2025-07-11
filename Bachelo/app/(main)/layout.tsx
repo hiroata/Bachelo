@@ -19,6 +19,8 @@ export default function MainLayout({
   const navigation = [
     { name: '音声掲示板', href: '/voice-board', icon: Mic },
     { name: '掲示板', href: '/board', icon: MessageSquare },
+    { name: '5ch板', href: '/5ch', icon: MessageSquare },
+    { name: 'ガルちゃん', href: '/girls', icon: MessageSquare },
     { name: 'クリエイター', href: '/creators', icon: User },
     ...(user ? [{ name: 'ダッシュボード', href: '/dashboard', icon: Home }] : []),
   ]
@@ -157,6 +159,68 @@ export default function MainLayout({
       </nav>
       
       {children}
+      
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white mt-12">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-xl font-bold mb-4 text-pink-400">Bachelo</h3>
+              <p className="text-gray-400 text-sm">
+                匿名音声掲示板 & アダルトボイスマーケットプレイス
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold mb-4">サービス</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="/voice-board" className="text-gray-400 hover:text-white transition-colors">
+                    音声掲示板
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/board" className="text-gray-400 hover:text-white transition-colors">
+                    掲示板
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/creators" className="text-gray-400 hover:text-white transition-colors">
+                    クリエイター一覧
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold mb-4">法的情報</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
+                    利用規約
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+                    プライバシーポリシー
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    お問い合わせ
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-gray-800 text-center">
+            <p className="text-gray-400 text-sm">
+              © 2025 Bachelo. All rights reserved. | 18歳未満の方の利用は固く禁止します
+            </p>
+          </div>
+        </div>
+      </footer>
     </>
   )
 }

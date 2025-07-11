@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createRouteHandlerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
+import crypto from 'crypto';
+import { checkNgWords, logNgWordDetection } from '@/lib/utils/ng-word-checker';
 
 const createReplySchema = z.object({
   post_id: z.string().uuid(),
@@ -22,20 +24,49 @@ export async function POST(request: NextRequest) {
       ALLOWED_ATTR: ['href', 'target', 'rel'],
     });
     
-    const supabase = createRouteHandlerClient();
-    
     // IPアドレスとユーザーエージェントを取得
-    const ip_address = request.headers.get('x-forwarded-for') || 
-                      request.headers.get('x-real-ip') || 
-                      'unknown';
+    const forwarded = request.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'unknown';
     const user_agent = request.headers.get('user-agent') || 'unknown';
+    
+    // IPアドレスをハッシュ化
+    const ipHash = crypto.createHash('sha256').update(ip).digest('hex');
+    
+    // NGワードチェック
+    const contentCheck = await checkNgWords(sanitizedContent);
+    
+    // NGワードが含まれている場合
+    if (!contentCheck.isClean) {
+      // 重大なNGワードが含まれている場合は返信を拒否
+      if (contentCheck.shouldBlock) {
+        // NGワード検出をログに記録
+        await logNgWordDetection(
+          'board_reply',
+          'blocked',
+          contentCheck.detectedWords.map(w => w.word),
+          contentCheck.highestSeverity!,
+          'blocked',
+          ipHash
+        );
+        
+        return NextResponse.json(
+          { 
+            error: '禁止されている言葉が含まれています。内容を修正してください。',
+            code: 'NG_WORD_DETECTED'
+          },
+          { status: 400 }
+        );
+      }
+    }
+    
+    const supabase = createRouteHandlerClient();
     
     const { data: reply, error } = await supabase
       .from('board_replies')
       .insert({
         ...validatedData,
         content: sanitizedContent,
-        ip_address,
+        ip_address: ipHash,
         user_agent,
       })
       .select()
@@ -43,6 +74,18 @@ export async function POST(request: NextRequest) {
     
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    
+    // 軽度のNGワードが検出された場合はログに記録（返信は許可）
+    if (!contentCheck.isClean) {
+      await logNgWordDetection(
+        'board_reply',
+        reply.id,
+        contentCheck.detectedWords.map(w => w.word),
+        contentCheck.highestSeverity!,
+        'flagged',
+        ipHash
+      );
     }
     
     return NextResponse.json(reply, { status: 201 });
