@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Flame, TrendingUp, Trophy, Clock, Calendar, MessageCircle, Eye, ThumbsUp } from 'lucide-react';
@@ -11,7 +11,7 @@ interface RankedPost extends BoardPost {
   rank?: number;
 }
 
-export default function RankingsPage() {
+function RankingsContent() {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') as 'hot' | 'trending' | 'all-time' || 'hot';
   
@@ -243,5 +243,19 @@ export default function RankingsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function RankingsPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+        </div>
+      </div>
+    }>
+      <RankingsContent />
+    </Suspense>
   );
 }

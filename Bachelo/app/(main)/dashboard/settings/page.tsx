@@ -61,9 +61,20 @@ export default function DashboardSettingsPage() {
     toast.info('アバター機能は準備中です')
   }
 
-  if (!user) {
-    router.push('/login')
-    return null
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login')
+    }
+  }, [user, loading, router])
+
+  if (loading || !user) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+        </div>
+      </div>
+    )
   }
 
   return (
