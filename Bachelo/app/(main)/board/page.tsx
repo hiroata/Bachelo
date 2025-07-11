@@ -8,6 +8,9 @@ import { BoardPost, BoardCategory } from '@/types/board';
 import PostModal from '@/components/board/PostModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { ReportModal } from '@/components/ui/ReportModal';
+import HotThreadsWidget from '@/components/board/HotThreadsWidget';
+import GlobalChatRooms from '@/components/chat/GlobalChatRooms';
+import UserProfileWidget from '@/components/user/UserProfileWidget';
 import { toast } from 'react-hot-toast';
 
 function BoardContent() {
@@ -197,11 +200,17 @@ function BoardContent() {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* ヘッダー */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* メインコンテンツ */}
+          <div className="lg:col-span-2">
+            {/* ヘッダー */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">匿名掲示板</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">日本最大級のアダルト掲示板</h1>
+              <p className="text-sm text-gray-600 mt-1">主婦・人妻の秘密の体験談が毎日更新中！</p>
+            </div>
             <button
               onClick={() => setShowPostModal(true)}
               className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition flex items-center gap-2"
@@ -242,12 +251,7 @@ function BoardContent() {
                 {categories.slice(0, 8).map(category => {
                   // 地域カテゴリーの場合は特別な処理
                   const isRegional = category.slug === 'region' || category.slug === 'regional';
-                  // 体験談カテゴリーの場合は特別な処理
-                  const isExperience = category.slug === 'confession' || category.slug === 'experience';
-                  
-                  const href = isRegional ? '/board/regional' : 
-                              isExperience ? '/board/experience' :
-                              `/board?category=${category.id}`;
+                  const href = isRegional ? '/board/regional' : `/board?category=${category.id}`;
                   
                   return (
                     <Link
@@ -277,12 +281,7 @@ function BoardContent() {
                   {categories.slice(8).map(category => {
                     // 地域カテゴリーの場合は特別な処理
                     const isRegional = category.slug === 'region' || category.slug === 'regional';
-                    // 体験談カテゴリーの場合は特別な処理
-                    const isExperience = category.slug === 'confession' || category.slug === 'experience';
-                    
-                    const href = isRegional ? '/board/regional' : 
-                                isExperience ? '/board/experience' :
-                                `/board?category=${category.id}`;
+                    const href = isRegional ? '/board/regional' : `/board?category=${category.id}`;
                     
                     return (
                       <Link
@@ -444,55 +443,66 @@ function BoardContent() {
           </div>
         )}
 
-        {/* ページネーション */}
-        {totalPages > 1 && (
-          <div className="mt-8 flex justify-center items-center gap-2">
-            <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            
-            <div className="flex gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
+            {/* ページネーション */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
                 
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-4 py-2 rounded-lg ${
-                      currentPage === pageNum
-                        ? 'bg-pink-500 text-white'
-                        : 'hover:bg-gray-100'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-            </div>
-            
-            <button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+                <div className="flex gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`px-4 py-2 rounded-lg ${
+                          currentPage === pageNum
+                            ? 'bg-pink-500 text-white'
+                            : 'hover:bg-gray-100'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* サイドバー */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-4 space-y-6">
+              <UserProfileWidget />
+              <HotThreadsWidget />
+              <GlobalChatRooms />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 投稿モーダル */}

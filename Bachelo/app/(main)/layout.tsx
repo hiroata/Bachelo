@@ -28,8 +28,9 @@ export default function MainLayout({
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-              <Link href="/board" className="text-2xl font-bold text-pink-500">
-                BACHELO
+              <Link href="/board" className="flex items-center space-x-2">
+                <span className="text-2xl font-bold text-pink-500">BACHELO</span>
+                <span className="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-full font-semibold">日本No.1</span>
               </Link>
               
               <div className="hidden md:flex space-x-4">

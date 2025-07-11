@@ -129,6 +129,25 @@ export default function PostModal({
       }
 
       toast.success('投稿が作成されました');
+      
+      // ポイントを付与
+      const userId = localStorage.getItem('user_id') || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem('user_id', userId);
+      
+      try {
+        await fetch('/api/user/points', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            action: 'post',
+            referenceId: post.id
+          })
+        });
+      } catch (error) {
+        console.error('Failed to add points:', error);
+      }
+      
       onSuccess();
       onClose();
     } catch (error) {

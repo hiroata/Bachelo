@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { BoardPost, BoardReply, CreateBoardReplyInput } from '@/types/board';
 import ReplyModal from '@/components/board/ReplyModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import LiveChatWidget from '@/components/chat/LiveChatWidget';
 import { toast } from 'react-hot-toast';
 import { Trash2 } from 'lucide-react';
 
@@ -455,6 +456,9 @@ export default function PostDetailPage() {
         cancelText="キャンセル"
         isLoading={deletingPost}
       />
+
+      {/* ライブチャット */}
+      <LiveChatWidget postId={postId} />
     </div>
   );
 }
