@@ -239,20 +239,26 @@ function BoardContent() {
                 >
                   すべて
                 </Link>
-                {categories.slice(0, 8).map(category => (
-                  <Link
-                    key={category.id}
-                    href={`/board?category=${category.id}`}
-                    className={`px-4 py-2 rounded-lg transition text-sm flex items-center gap-1 ${
-                      categoryId === category.id 
-                        ? 'bg-pink-500 text-white' 
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {category.icon && <span>{category.icon}</span>}
-                    {category.name}
-                  </Link>
-                ))}
+                {categories.slice(0, 8).map(category => {
+                  // 地域カテゴリーの場合は特別な処理
+                  const isRegional = category.slug === 'region' || category.slug === 'regional';
+                  const href = isRegional ? '/board/regional' : `/board?category=${category.id}`;
+                  
+                  return (
+                    <Link
+                      key={category.id}
+                      href={href}
+                      className={`px-4 py-2 rounded-lg transition text-sm flex items-center gap-1 ${
+                        categoryId === category.id 
+                          ? 'bg-pink-500 text-white' 
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {category.icon && <span>{category.icon}</span>}
+                      {category.name}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
             
@@ -263,20 +269,26 @@ function BoardContent() {
                   その他のカテゴリー ({categories.length - 8}件) ▼
                 </summary>
                 <div className="mt-2 flex gap-2 flex-wrap">
-                  {categories.slice(8).map(category => (
-                    <Link
-                      key={category.id}
-                      href={`/board?category=${category.id}`}
-                      className={`px-4 py-2 rounded-lg transition text-sm flex items-center gap-1 ${
-                        categoryId === category.id 
-                          ? 'bg-pink-500 text-white' 
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {category.icon && <span>{category.icon}</span>}
-                      {category.name}
-                    </Link>
-                  ))}
+                  {categories.slice(8).map(category => {
+                    // 地域カテゴリーの場合は特別な処理
+                    const isRegional = category.slug === 'region' || category.slug === 'regional';
+                    const href = isRegional ? '/board/regional' : `/board?category=${category.id}`;
+                    
+                    return (
+                      <Link
+                        key={category.id}
+                        href={href}
+                        className={`px-4 py-2 rounded-lg transition text-sm flex items-center gap-1 ${
+                          categoryId === category.id 
+                            ? 'bg-pink-500 text-white' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {category.icon && <span>{category.icon}</span>}
+                        {category.name}
+                      </Link>
+                    );
+                  })}
                 </div>
               </details>
             )}
