@@ -124,7 +124,7 @@ export default function ExperienceBoardPage() {
       <div className="bg-blue-50 border border-blue-200 py-4">
         <div className="container mx-auto px-4">
           <p className="text-center text-blue-700">
-            日本最大の素人投稿アダルト掲示板ナンネット！日々大量にいただく投稿は削除依頼等なものばかり！
+            日本最大の素人投稿アダルト掲示板BACHELO！日々大量にいただく投稿は削除依頼等なものばかり！
           </p>
           <p className="text-center text-blue-600 font-bold text-2xl mt-2">
             只今の新着投稿 6255 件
@@ -195,53 +195,53 @@ export default function ExperienceBoardPage() {
 
           {/* サイドバー */}
           <div className="space-y-6">
-            {/* ナンネット掲示板 */}
+            {/* BACHELO掲示板 */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 -m-4 mb-4 rounded-t-lg">
-                <h4 className="font-bold">ナンネット掲示板</h4>
+                <h4 className="font-bold">BACHELO掲示板</h4>
               </div>
               <p className="text-sm text-gray-600">
                 日本最大の素人投稿アダルト掲示板。露出・人妻など様々なカテゴリ、画像や動画の投稿も！
               </p>
             </div>
 
-            {/* ナンネットID */}
+            {/* BACHELO ID */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 -m-4 mb-4 rounded-t-lg">
-                <h4 className="font-bold">ナンネットID</h4>
+                <h4 className="font-bold">BACHELO ID</h4>
               </div>
               <p className="text-sm text-gray-600">
-                ナンネットIDを取得するとナンネットの様々なサービスをご利用いただけます。
+                BACHELO IDを取得するとBACHELOの様々なサービスをご利用いただけます。
               </p>
             </div>
 
-            {/* 地域別掲示板アダコミ */}
+            {/* BACHELO地域別掲示板 */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-3 -m-4 mb-4 rounded-t-lg">
-                <h4 className="font-bold">地域別掲示板アダコミ</h4>
+                <h4 className="font-bold">BACHELO地域別掲示板</h4>
               </div>
               <p className="text-sm text-gray-600">
                 ID登録ユーザー専用の地域別掲示板。
               </p>
             </div>
 
-            {/* タイムライン */}
+            {/* BACHELOタイムライン */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-3 -m-4 mb-4 rounded-t-lg">
-                <h4 className="font-bold">タイムライン</h4>
+                <h4 className="font-bold">BACHELOタイムライン</h4>
               </div>
               <p className="text-sm text-gray-600">
-                あなたの今日の出来事は？ナンネットユーザーと今をシェアしよう！
+                あなたの今日の出来事は？BACHELOユーザーと今をシェアしよう！
               </p>
             </div>
 
-            {/* 総合ナビ */}
+            {/* BACHELO総合ナビ */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white p-3 -m-4 mb-4 rounded-t-lg">
-                <h4 className="font-bold">総合ナビ</h4>
+                <h4 className="font-bold">BACHELO総合ナビ</h4>
               </div>
               <p className="text-sm text-gray-600">
-                ナンネットの総合案内ページ
+                BACHELOの総合案内ページ
               </p>
             </div>
           </div>
