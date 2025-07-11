@@ -60,7 +60,8 @@
       "WebFetch(domain:nan-net.com)",
       "WebFetch(domain:www.adacomi.com)",
       "Bash(npx tsc:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(PORT=\"4000\" timeout 5 node scripts/start.js)"
     ],
     "deny": []
   }
