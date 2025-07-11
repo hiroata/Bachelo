@@ -3,10 +3,10 @@ import { headers } from 'next/headers'
 import { scheduledCleanup } from '@/lib/storage/cleanup'
 
 export async function GET(request: Request) {
-  // セキュリティ: Vercel Cronまたは管理者のみアクセス可能
+  // セキュリティ: Cronジョブまたは管理者のみアクセス可能
   const authHeader = headers().get('authorization')
   
-  // Vercel Cronトークンまたは管理者トークンをチェック
+  // Cronシークレットトークンまたは管理者トークンをチェック
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

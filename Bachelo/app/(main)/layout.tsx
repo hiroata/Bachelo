@@ -17,10 +17,8 @@ export default function MainLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navigation = [
-    { name: '音声掲示板', href: '/voice-board', icon: Mic },
     { name: '掲示板', href: '/board', icon: MessageSquare },
-    { name: '5ch板', href: '/5ch', icon: MessageSquare },
-    { name: 'ガルちゃん', href: '/girls', icon: MessageSquare },
+    { name: '音声掲示板', href: '/voice-board', icon: Mic },
     { name: 'クリエイター', href: '/creators', icon: User },
     ...(user ? [{ name: 'ダッシュボード', href: '/dashboard', icon: Home }] : []),
   ]
@@ -31,7 +29,7 @@ export default function MainLayout({
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-              <Link href="/" className="text-2xl font-bold text-pink-500">
+              <Link href="/board" className="text-2xl font-bold text-pink-500">
                 BACHELO
               </Link>
               

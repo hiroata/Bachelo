@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 
-// ストレージクリーンアップ関数（Vercel Cronまたは手動実行用）
+// ストレージクリーンアップ関数（Cronジョブまたは手動実行用）
 export async function cleanupExpiredContent() {
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

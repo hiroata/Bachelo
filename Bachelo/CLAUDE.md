@@ -1,4 +1,9 @@
-# Bachelo - プロジェクトコンテキスト
+# Bachelo - 開発者向け詳細技術ドキュメント
+
+## 📄 ドキュメントの役割分担
+
+- **README.md**: ユーザー向けのクイックスタートガイド（3分でセットアップ）
+- **CLAUDE.md**: 開発者向けの詳細な技術情報、アーキテクチャ、実装の詳細
 
 ## 🎯 プロジェクト概要
 
@@ -14,7 +19,7 @@ Backend:   Next.js API Routes
 Database:  Supabase (PostgreSQL)
 Storage:   Supabase Storage
 Auth:      Supabase Auth
-Deploy:    Vercel
+Deploy:    Render (旧: Vercel)
 ```
 
 ## 🚀 実装済み機能
@@ -26,27 +31,38 @@ Deploy:    Vercel
    - 音声再生プレイヤー
    - リアルタイム更新 (Supabase Realtime)
 
-2. **テキスト掲示板**
+2. **テキスト掲示板（5ch風）**
    - カテゴリー別投稿
    - 画像アップロード（最大4枚、各5MB以下）
    - 返信スレッド機能
    - 投票システム（+/-ボタン）
    - リアルタイム返信数カウント
    - ページネーション
+   - スレッド式掲示板（/girls/[board]/[thread]）
 
-3. **データ永続化**
-   - Supabase Storage統合
-   - PostgreSQLデータベース
-   - Row Level Security (RLS)
-   - 自動クリーンアップ機能
-
-4. **セキュリティ**
-   - ファイル検証（形式・サイズ）
+3. **セキュリティ・モデレーション**
+   - 年齢確認ゲート（18歳以上、middleware実装）
+   - 通報システム（投稿・返信の通報機能）
+   - NGワード自動フィルタリング
+   - 管理画面（/admin）でのモデレーション
    - IPアドレスハッシュ化
    - XSS対策（DOMPurify）
-   - レート制限
+   - レート制限（1分5投稿）
    - CSRFトークン検証
-   - 年齢確認ゲート（middleware）
+   - ファイル検証（形式・サイズ）
+
+4. **データ管理**
+   - Supabase Storage統合
+   - PostgreSQLデータベース
+   - Row Level Security (RLS) - 開発時は無効化
+   - 自動クリーンアップ機能（7日で投稿削除）
+   - カスケード削除（投稿削除時に関連データも削除）
+
+5. **管理機能**
+   - 管理者ダッシュボード（/admin）
+   - 通報管理（承認/却下）
+   - NGワード管理
+   - 統計情報表示
 
 ## 📝 重要なコマンド
 
@@ -89,9 +105,16 @@ npm run update:reply-counts  # 返信数の更新
 │   │   ├── board/                 # テキスト掲示板
 │   │   │   ├── page.tsx           # 一覧（Suspense対応）
 │   │   │   └── post/[id]/page.tsx # 投稿詳細
+│   │   ├── girls/                 # 5ch風掲示板
+│   │   │   └── [board]/[thread]/  # スレッド表示
 │   │   ├── creators/              # クリエイター一覧
 │   │   ├── dashboard/             # ダッシュボード
 │   │   └── layout.tsx             # 共通レイアウト
+│   ├── admin/                     # 管理画面
+│   │   ├── page.tsx               # ダッシュボード
+│   │   ├── layout.tsx             # 管理画面レイアウト
+│   │   └── moderation/            # モデレーション
+│   ├── age-gate/                  # 年齢確認ページ
 │   └── api/
 │       ├── voice/upload/          # 音声投稿API
 │       ├── board/                 # 掲示板API
@@ -101,6 +124,8 @@ npm run update:reply-counts  # 返信数の更新
 │       │   ├── replies/           # 返信機能
 │       │   │   └── [id]/vote/     # 返信投票
 │       │   └── upload/            # 画像アップロード
+│       ├── reports/               # 通報API
+│       │   └── [id]/              # 通報処理
 │       └── cleanup/               # 自動クリーンアップ
 ├── components/
 │   ├── board/                     # 掲示板コンポーネント
@@ -108,13 +133,16 @@ npm run update:reply-counts  # 返信数の更新
 │   │   └── ReplyModal.tsx         # 返信モーダル
 │   ├── voice-board/               # 音声掲示板コンポーネント
 │   └── ui/                        # 共通UIコンポーネント
+│       └── ReportModal.tsx        # 通報モーダル
 ├── lib/
 │   ├── storage/                   # ストレージ関連
 │   ├── supabase/                  # Supabaseクライアント
 │   ├── validations/               # Zodスキーマ
 │   └── utils/                     # ユーティリティ
 │       ├── error-handler.ts       # サーバー用エラーハンドラー
-│       └── error-handler.client.ts # クライアント用
+│       ├── error-handler.client.ts # クライアント用
+│       ├── ng-word-checker.ts     # NGワードチェッカー
+│       └── rate-limiter.ts        # レート制限
 ├── hooks/
 │   ├── useAuth.ts                 # 認証フック
 │   └── useRealtimeVoicePosts.ts   # リアルタイム更新
@@ -122,7 +150,8 @@ npm run update:reply-counts  # 返信数の更新
 │   ├── board.ts                   # 掲示板型定義
 │   └── database.ts                # Supabase型定義
 ├── scripts/                       # シードスクリプト
-└── supabase/migrations/           # DBマイグレーション
+├── supabase/migrations/           # DBマイグレーション（001-015）
+└── middleware.ts                  # 年齢確認ミドルウェア
 ```
 
 ## ⚠️ セットアップ要件
@@ -146,6 +175,13 @@ CRON_SECRET=your_cron_secret_here
    - 006_add_reply_voting.sql（返信投票）
    - 007_add_sample_votes.sql（サンプルデータ）
    - 008_add_more_replies.sql（追加返信）
+   - 009_disable_rls_for_easier_development.sql（開発用RLS無効化）
+   - 010_add_category_icons.sql（カテゴリーアイコン）
+   - 011_add_cascade_deletes.sql（カスケード削除）
+   - 012_create_5ch_schema.sql（5ch風掲示板）
+   - 013_insert_initial_boards.sql（初期掲示板データ）
+   - 014_create_reports_system.sql（通報システム）
+   - 015_create_ng_words_system.sql（NGワードシステム）
 3. **Storageバケット作成**
    - 「voice-posts」（公開設定）
    - 「images」（掲示板画像用、公開設定）
@@ -194,53 +230,92 @@ CRON_SECRET=your_cron_secret_here
 ## 🚦 今後の実装予定
 
 1. **有料リクエスト機能**
-   - 決済システム統合
-   - クリエイター管理画面
-   - 収益分配システム
+   - 決済システム統合（Stripe）
+   - クリエイター収益管理
+   - 自動振込システム
 
 2. **パフォーマンス最適化**
    - 無限スクロール実装
    - Redis/Memcachedキャッシング
-   - CDN統合
+   - CDN統合（Cloudflare）
+   - 画像最適化（WebP変換）
 
 3. **機能拡張**
-   - プッシュ通知
-   - DM機能
-   - ランキングシステム
-   - タグ検索機能
+   - プッシュ通知（FCM）
+   - WebSocket対応チャット
+   - AI音声生成機能
+   - タグ検索・フィルタリング
+   - ユーザープロフィール機能
 
-4. **テスト**
+4. **品質向上**
    - Jestによるユニットテスト
    - Playwrightによるe2eテスト
    - Storybookによるコンポーネント管理
+   - CI/CD改善（GitHub Actions）
 
 ## 🐛 既知の問題と対策
 
-1. **ESLint設定の競合**
-   - ルートディレクトリの.eslintrc.jsonを削除済み
-   - Bacheloディレクトリの設定を使用
+1. **TypeScript型エラー対策**
+   - 一部の型定義で`any`を使用（段階的に改善中）
+   - Supabase Realtime関連の型エラー
+   - ビルド時は`tsc --noEmit`でチェック
 
-2. **Vercelビルドエラー（ENOENT）**
-   - Next.js内部の最適化ファイルエラー
-   - アプリケーションの動作には影響なし
+2. **Renderデプロイ時の注意**
+   - 無料プランは15分アクセスなしでスリープ
+   - 初回アクセス時に起動時間がかかる
+   - 環境変数の設定を確実に行う
 
-3. **Supabase Realtimeの型エラー**
-   - `postgres_changes as any`で一時的に対処
-   - Supabaseライブラリの更新待ち
+3. **パフォーマンス最適化**
+   - 大量データ時のページネーション必須
+   - 画像の遅延読み込み実装済み
+   - React.memoによるメモ化を活用
+
+4. **セキュリティ考慮事項**
+   - 本番環境では必ずRLSを有効化
+   - 環境変数の適切な管理
+   - CSRFトークンの実装確認
 
 ## 📚 参考資料
 
+- `README.md` - ユーザー向けクイックスタートガイド
 - `setup-instructions.md` - 詳細なセットアップ手順
 - `supabase/migrations/` - データベース設計書
-- `docs/` - 追加ドキュメント
 - `.env.local.example` - 環境変数テンプレート
 
-## 📅 最終更新: 2025-01-10
+## 🔧 開発Tips
+
+### デバッグ方法
+```bash
+# APIエラーの確認
+npm run dev
+# ブラウザのコンソールとNetwork タブを確認
+
+# TypeScript型エラーの確認
+npm run type-check
+
+# Supabaseログの確認
+# Supabaseダッシュボード → Logs → API logs
+```
+
+### よくあるエラーと対処法
+1. **「RLS policy violation」エラー**
+   - 開発環境: 009_disable_rls_for_easier_development.sql を実行
+   - 本番環境: 適切なRLSポリシーを設定
+
+2. **「CORS error」エラー**
+   - 環境変数のSUPABASE_URLが正しいか確認
+   - Supabaseダッシュボードで許可ドメインを設定
+
+3. **「Rate limit exceeded」エラー**
+   - `/lib/utils/rate-limiter.ts`でレート制限を調整
+   - 本番環境ではRedis導入を検討
+
+## 📅 最終更新: 2025-01-11
 
 ### 主な変更点
-- プロジェクト名をBacheloに統一
-- TypeScript型定義を完全に改善
-- コンポーネントの分割とリファクタリング
-- 重複ディレクトリの整理
-- エラーハンドリングの統一
-- React Hooksの最適化
+- 年齢確認ゲート（middleware）実装
+- 通報システム・管理画面の追加
+- NGワード自動フィルタリング機能
+- 5ch風掲示板システムの実装
+- デプロイ先をVercelからRenderに変更
+- 開発者向けドキュメントとして役割を明確化
