@@ -21,7 +21,7 @@ const dummyCreators: Creator[] = [
     name: 'ニューダイ',
     displayId: 'newdai',
     avatar: '/avatars/1.jpg',
-    coverImage: '/covers/1.jpg',
+    coverImage: '',
     description: '癒し系ボイスをお届けします♪',
     isOnline: true
   },
@@ -73,7 +73,7 @@ const dummyCreators: Creator[] = [
     name: 'ぽちゃ子さん',
     displayId: 'pochako',
     avatar: '/avatars/8.jpg',
-    coverImage: '/covers/8.jpg',
+    coverImage: '',
     description: 'ぽっちゃり系ボイス',
     isOnline: true
   }
