@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
-import { Home, User, Mic, LogOut, Menu, MessageSquare } from 'lucide-react'
+import { Home, User, Mic, LogOut, Menu, MessageSquare, Crown, Sparkles, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 
 export default function MainLayout({
@@ -19,6 +19,8 @@ export default function MainLayout({
   const navigation = [
     { name: '掲示板', href: '/board', icon: MessageSquare },
     { name: 'クリエイター', href: '/creators', icon: User },
+    { name: 'AI音声', href: '/ai-voice', icon: Sparkles },
+    { name: 'プレミアム', href: '/premium', icon: Crown },
     ...(user ? [{ name: 'ダッシュボード', href: '/dashboard', icon: Home }] : []),
   ]
 
@@ -178,8 +180,33 @@ export default function MainLayout({
                   </Link>
                 </li>
                 <li>
+                  <Link href="/board/categories" className="text-gray-400 hover:text-white transition-colors">
+                    全カテゴリー 🔥
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/board/regional" className="text-gray-400 hover:text-white transition-colors">
+                    地域別掲示板
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/board/ranking" className="text-gray-400 hover:text-white transition-colors">
+                    人気ランキング
+                  </Link>
+                </li>
+                <li>
                   <Link href="/creators" className="text-gray-400 hover:text-white transition-colors">
                     クリエイター一覧
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/ai-voice" className="text-gray-400 hover:text-white transition-colors">
+                    AI音声生成
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/premium" className="text-gray-400 hover:text-white transition-colors">
+                    プレミアムプラン
                   </Link>
                 </li>
               </ul>

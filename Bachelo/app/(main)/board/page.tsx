@@ -3,11 +3,12 @@
 import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Crown, MessageCircle, Plus, ChevronLeft, ChevronRight, Search, Trash2, AlertTriangle } from 'lucide-react';
+import { Crown, MessageCircle, Plus, ChevronLeft, ChevronRight, Search, Trash2, AlertTriangle, Heart } from 'lucide-react';
 import { BoardPost, BoardCategory } from '@/types/board';
 import PostModal from '@/components/board/PostModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { ReportModal } from '@/components/ui/ReportModal';
+import TipModal from '@/components/ui/TipModal';
 import HotThreadsWidget from '@/components/board/HotThreadsWidget';
 import GlobalChatRooms from '@/components/chat/GlobalChatRooms';
 import UserProfileWidget from '@/components/user/UserProfileWidget';
@@ -36,6 +37,10 @@ function BoardContent() {
   
   // 通報関連の状態
   const [reportPostId, setReportPostId] = useState<string | null>(null);
+  
+  // 投げ銭関連の状態
+  const [tipModalOpen, setTipModalOpen] = useState(false);
+  const [tipRecipient, setTipRecipient] = useState<{id: string, name: string, postId?: string}>({id: '', name: ''});
 
   // カテゴリー取得
   useEffect(() => {
@@ -234,6 +239,14 @@ function BoardContent() {
 
           {/* カテゴリータブ */}
           <div className="space-y-3">
+            {/* 全カテゴリーへのリンク */}
+            <Link
+              href="/board/categories"
+              className="block w-full bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:from-red-600 hover:to-pink-600 transition text-center font-bold"
+            >
+              🔥 全23カテゴリーを見る（近親相姦・露出・SM・etc）
+            </Link>
+            
             {/* 人気カテゴリー */}
             <div>
               <h3 className="text-sm font-semibold text-gray-600 mb-2">人気カテゴリー</h3>
@@ -359,7 +372,9 @@ function BoardContent() {
                       </div>
                       <p className="text-gray-600 mb-3 line-clamp-2">{post.content}</p>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span>{post.author_name}</span>
+                        <Link href={`/users/${post.author_name.toLowerCase().replace(/\s+/g, '')}`} className="hover:text-pink-500 hover:underline">
+                          {post.author_name}
+                        </Link>
                         <span>{formatDate(post.created_at)}</span>
                         {post.category && (
                           <span className="bg-gray-100 px-2 py-1 rounded inline-flex items-center gap-1">
@@ -405,6 +420,17 @@ function BoardContent() {
                         title="通報"
                       >
                         <AlertTriangle className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setTipRecipient({id: 'anonymous', name: post.author_name, postId: post.id});
+                          setTipModalOpen(true);
+                        }}
+                        className="flex items-center gap-1 px-3 py-1 rounded bg-yellow-50 text-yellow-600 hover:bg-yellow-100 transition"
+                        title="投げ銭"
+                      >
+                        <Heart className="w-4 h-4" />
+                        <span className="text-xs">投げ銭</span>
                       </button>
                     </div>
                   </div>
@@ -538,6 +564,15 @@ function BoardContent() {
           contentId={reportPostId}
         />
       )}
+      
+      {/* 投げ銭モーダル */}
+      <TipModal
+        isOpen={tipModalOpen}
+        onClose={() => setTipModalOpen(false)}
+        recipientName={tipRecipient.name}
+        recipientId={tipRecipient.id}
+        postId={tipRecipient.postId}
+      />
     </>
   );
 }
