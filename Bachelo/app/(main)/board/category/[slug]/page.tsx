@@ -154,21 +154,76 @@ export default function CategoryDetailPage() {
   const fetchCategoryPosts = async () => {
     setLoading(true);
     try {
-      // カテゴリーに関連する投稿を取得
-      const response = await fetch(`/api/board/posts?search=${category?.name || ''}`);
-      const data = await response.json();
-      
-      if (data.posts) {
-        // カテゴリー専用のモックデータを生成
-        const mockPosts = generateMockPosts();
-        const allPosts = [...mockPosts, ...data.posts];
-        
-        // ソート処理
-        const sortedPosts = sortPosts(allPosts, sortBy);
-        setPosts(sortedPosts);
+      if (!category) {
+        setPosts([]);
+        setLoading(false);
+        return;
       }
+
+      // まずカテゴリーIDを取得
+      const categoriesResponse = await fetch('/api/board/categories');
+      const categoriesData = await categoriesResponse.json();
+      
+      console.log('Available categories:', categoriesData);
+      
+      // スラッグまたは名前でカテゴリーを見つける
+      const dbCategory = categoriesData.find((cat: any) => 
+        cat.slug === categorySlug || 
+        cat.name === category.name ||
+        cat.name.includes(category.name) ||
+        category.name.includes(cat.name)
+      );
+      
+      console.log('Found DB category:', dbCategory, 'for slug:', categorySlug, 'and name:', category.name);
+      
+      if (!dbCategory) {
+        console.warn('No matching database category found, using mock data');
+        setPosts(sortPosts(generateMockPosts(), sortBy));
+        setLoading(false);
+        return;
+      }
+
+      // カテゴリーIDで投稿を取得
+      const params = new URLSearchParams({
+        category_id: dbCategory.id,
+        page: '1',
+        per_page: '50'
+      });
+
+      const response = await fetch(`/api/board/posts?${params}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+
+      console.log('Category posts API response:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Category posts API error:', errorData);
+        throw new Error(`Failed to fetch category posts: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Category posts data:', {
+        categoryName: category.name,
+        categoryId: dbCategory.id,
+        postsCount: data.posts?.length || 0,
+        total: data.total || 0,
+        firstPost: data.posts?.[0]?.title
+      });
+      
+      // 実データとモックデータを合わせる
+      const mockPosts = generateMockPosts();
+      const allPosts = [...(data.posts || []), ...mockPosts];
+      
+      // ソート処理
+      const sortedPosts = sortPosts(allPosts, sortBy);
+      setPosts(sortedPosts);
+      
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error('Error fetching category posts:', error);
       // エラー時はモックデータのみ
       setPosts(sortPosts(generateMockPosts(), sortBy));
     } finally {
