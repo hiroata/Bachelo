@@ -11,7 +11,10 @@
     "seed:board": "node scripts/seed-board.js",
     "seed:replies": "node scripts/seed-replies.js",
     "update:reply-counts": "node scripts/update-reply-counts.js",
-    "expand:categories": "node scripts/expand-categories.js"
+    "expand:categories": "node scripts/expand-categories.js",
+    "db:setup": "node setup-complete-database.js",
+    "db:populate": "node diagnose-and-populate-database.js",
+    "db:reset": "echo 'Go to Supabase Dashboard > SQL Editor and run: DROP SCHEMA public CASCADE; CREATE SCHEMA public;'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -6,8 +6,8 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BACHELO - アダルトボイスマーケットプレイス",
-  description: "プロフェッショナルなアダルトボイスのオーダーメイドサービス",
+  title: "BACHELO - 日本最大級のアダルト掲示板",
+  description: "あらゆる性癖・欲望に対応！23カテゴリー・70万投稿の巨大コミュニティ",
 };
 
 export default function RootLayout({

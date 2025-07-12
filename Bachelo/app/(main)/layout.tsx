@@ -18,9 +18,9 @@ export default function MainLayout({
 
   const navigation = [
     { name: '掲示板', href: '/board', icon: MessageSquare },
-    { name: 'クリエイター', href: '/creators', icon: User },
-    { name: 'AI音声', href: '/ai-voice', icon: Sparkles },
-    { name: 'プレミアム', href: '/premium', icon: Crown },
+    { name: 'カテゴリー', href: '/board/categories', icon: Sparkles },
+    { name: '地域別', href: '/board/regional', icon: TrendingUp },
+    { name: 'ランキング', href: '/board/ranking', icon: Crown },
     ...(user ? [{ name: 'ダッシュボード', href: '/dashboard', icon: Home }] : []),
   ]
 
@@ -167,7 +167,7 @@ export default function MainLayout({
             <div>
               <h3 className="text-xl font-bold mb-4 text-pink-400">Bachelo</h3>
               <p className="text-gray-400 text-sm">
-                匿名音声掲示板 & アダルトボイスマーケットプレイス
+                日本最大級のアダルト掲示板コミュニティ
               </p>
             </div>
             
@@ -197,11 +197,6 @@ export default function MainLayout({
                 <li>
                   <Link href="/creators" className="text-gray-400 hover:text-white transition-colors">
                     クリエイター一覧
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/ai-voice" className="text-gray-400 hover:text-white transition-colors">
-                    AI音声生成
                   </Link>
                 </li>
                 <li>
