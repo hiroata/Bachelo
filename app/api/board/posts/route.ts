@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 import { postRateLimiter } from '@/lib/utils/rate-limiter';
@@ -24,7 +24,10 @@ export async function GET(request: NextRequest) {
     const category_id = searchParams.get('category_id');
     const search = searchParams.get('search');
     
-    const supabase = createRouteHandlerClient();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     
     let query = supabase
       .from('board_posts')
@@ -147,7 +150,10 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    const supabase = createRouteHandlerClient();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     
     // ユーザーエージェントを取得
     const user_agent = request.headers.get('user-agent') || 'unknown';

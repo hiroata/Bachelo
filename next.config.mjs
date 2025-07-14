@@ -9,6 +9,12 @@ const nextConfig = {
     // ESLintエラーも無視
     ignoreDuringBuilds: true,
   },
+  // 静的生成の設定
+  output: 'standalone',
+  // 特定のページを静的生成から除外
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
   // Render最適化: 静的アセットのキャッシュ設定
   async headers() {
     return [

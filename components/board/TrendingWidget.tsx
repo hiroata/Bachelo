@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { TrendingUp, Fire, Clock, Users, ArrowUp } from 'lucide-react';
+import { TrendingUp, Flame, Clock, Users, ArrowUp } from 'lucide-react';
 
 interface TrendingPost {
   id: string;
@@ -102,7 +102,7 @@ export default function TrendingWidget() {
       <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-lg flex items-center gap-2">
-            <Fire className="w-5 h-5 text-orange-500" />
+            <Flame className="w-5 h-5 text-orange-500" />
             トレンド
           </h3>
           <button
@@ -222,7 +222,7 @@ export default function TrendingWidget() {
               </Link>
             )) || (
               <div className="text-center py-6 text-gray-500">
-                <Fire className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                <Flame className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                 <p>トレンド投稿はありません</p>
               </div>
             )}

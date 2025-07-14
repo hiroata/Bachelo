@@ -18,6 +18,9 @@ import DailyChallengeWidget from '@/components/board/DailyChallengeWidget';
 import AnonymousConfessionBox from '@/components/board/AnonymousConfessionBox';
 import { toast } from 'react-hot-toast';
 
+// 動的レンダリングを強制
+export const dynamic = 'force-dynamic';
+
 function BoardContent() {
   const searchParams = useSearchParams();
   const categoryId = searchParams.get('category');
