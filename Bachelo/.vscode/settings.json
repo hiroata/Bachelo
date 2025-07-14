@@ -1,0 +1,11 @@
+{
+    "liveServer.settings.port": 5502,
+    "github.copilot.experimental.chat.mcp.enabled": true,
+    "chat.mcp.serverSampling": {
+        "Bachelo/.vscode/mcp.json: supabase": {
+            "allowedModels": [
+                "github.copilot-chat/claude-sonnet-4"
+            ]
+        }
+    }
+}

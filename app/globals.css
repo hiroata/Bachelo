@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #fef5f7;
+  --foreground: #333333;
+  --primary-pink: #ff9db4;
+  --secondary-pink: #ffb3c1;
+  --light-pink: #ffe0e6;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@layer components {
+  /* ガルちゃん風投票ボタン */
+  .vote-plus-btn {
+    @apply bg-pink-500 text-white px-3 py-1.5 rounded-md flex items-center gap-1 text-sm font-bold hover:bg-pink-600 transition;
+  }
+  
+  .vote-minus-btn {
+    @apply bg-gray-400 text-white px-3 py-1.5 rounded-md flex items-center gap-1 text-sm font-bold hover:bg-gray-500 transition;
+  }
+  
+  /* 投票バー */
+  .vote-bar {
+    @apply relative h-6 bg-gray-200 rounded-md overflow-hidden flex items-center;
+  }
+  
+  .vote-bar-fill {
+    @apply absolute left-0 top-0 h-full bg-gradient-to-r from-pink-400 to-pink-500 transition-all duration-500;
+  }
+  
+  /* 返信カウント */
+  .reply-badge {
+    @apply inline-flex items-center gap-1 text-pink-500 text-sm bg-pink-50 px-2 py-0.5 rounded;
+  }
+  
+  /* トピックカード */
+  .topic-card {
+    @apply bg-white rounded-lg shadow-sm border border-pink-100 hover:shadow-md transition;
+  }
+  
+  /* ランキング番号 */
+  .ranking-number {
+    @apply inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-pink-400 to-pink-500 text-white font-bold rounded-lg text-sm;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
