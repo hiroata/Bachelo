@@ -45,6 +45,11 @@ firebase-debug.log
 firebase.json
 .firebaserc
 
+# Vercel (completely blocked)
+.vercel
+vercel.json
+.vercel.json
+
 # Large binary files
 *.exe
 *.tar.gz

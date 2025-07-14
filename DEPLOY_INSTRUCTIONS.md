@@ -46,6 +46,6 @@ git push origin main
 3. 環境変数を設定
 4. デプロイ！
 
-## Vercelの注意点
+## まとめ
 
-Vercelを使用する場合は、適切な設定が必要です。Render.comの方が簡単で推奨されます。
+Render.comが最も簡単で推奨されるデプロイ方法です。Supabaseとの相性も良好です。

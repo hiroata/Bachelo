@@ -14,7 +14,7 @@ Backend:   Next.js API Routes
 Database:  Supabase (PostgreSQL)
 Storage:   Supabase Storage
 Auth:      Supabase Auth
-Deploy:    Vercel
+Deploy:    Render.com
 ```
 
 ## 🚀 実装済み機能
@@ -220,9 +220,9 @@ CRON_SECRET=your_cron_secret_here
    - ルートディレクトリの.eslintrc.jsonを削除済み
    - Bacheloディレクトリの設定を使用
 
-2. **Vercelビルドエラー（ENOENT）**
-   - Next.js内部の最適化ファイルエラー
-   - アプリケーションの動作には影響なし
+2. **デプロイ最適化**
+   - Render.com対応の設定に統一
+   - 軽量化とパフォーマンス向上
 
 3. **Supabase Realtimeの型エラー**
    - `postgres_changes as any`で一時的に対処

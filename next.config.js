@@ -3,7 +3,7 @@ const nextConfig = {
   // 静的エクスポート用
   // output: 'export',
   
-  // 通常のSSR用（Vercel/Render）
+  // 通常のSSR用（Render.com等）
   images: {
     remotePatterns: [
       {

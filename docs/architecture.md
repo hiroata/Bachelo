@@ -17,14 +17,14 @@ Backend:   Next.js API Routes
 Database:  Supabase (PostgreSQL)
 Storage:   Supabase Storage
 Auth:      Supabase Auth
-Deploy:    Vercel
+Deploy:    Render.com
 ```
 
 ### システム構成
 ```
 ┌─────────────┐     ┌──────────────┐     ┌────────────────┐
 │   Client    │────▶│  Next.js App │────▶│    Supabase    │
-│  (Browser)  │◀────│   (Vercel)   │◀────│   PostgreSQL   │
+│  (Browser)  │◀────│  (Render.com)│◀────│   PostgreSQL   │
 └─────────────┘     └──────────────┘     └────────────────┘
                             │                      │
                             └──────────────────────┘
@@ -135,15 +135,15 @@ CREATE INDEX idx_posts_anchors ON posts USING GIN(anchors);
 ```
 現在の構成で対応可能
 - Supabase Free/Pro
-- Vercel Hobby/Pro
+- Render.com Free/Pro
 - 基本的なキャッシュ
 ```
 
 #### 中規模（〜100万PV/月）
 ```
 ┌──────────┐     ┌─────────────┐     ┌──────────────┐
-│ Cloudflare├────▶│   Vercel    │────▶│   Supabase   │
-│    CDN    │     │  Functions  │     │     Pro      │
+│ Cloudflare├────▶│  Render.com │────▶│   Supabase   │
+│    CDN    │     │   Services  │     │     Pro      │
 └──────────┘     └─────────────┘     └──────────────┘
                         │                     │
                         └─────────────────────┘
@@ -298,15 +298,15 @@ Analytics: Google Analytics / Plausible
 | サービス | プラン | 月額 |
 |---------|--------|------|
 | Supabase | Pro | $25 |
-| Vercel | Pro | $20 |
+| Render.com | Pro | $7 |
 | Upstash Redis | Free | $0 |
-| **合計** | | **$45** |
+| **合計** | | **$32** |
 
 ### 中規模運用（〜100万PV/月）
 | サービス | プラン | 月額 |
 |---------|--------|------|
 | Supabase | Pro | $25 |
-| Vercel | Pro | $20 |
+| Render.com | Pro | $20 |
 | Upstash Redis | Pay as you go | $50 |
 | Cloudflare | Pro | $20 |
 | **合計** | | **$115** |

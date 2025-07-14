@@ -9,7 +9,7 @@
 - **Database**: Supabase (PostgreSQL)
 - **Storage**: Supabase Storage
 - **Authentication**: Supabase Auth
-- **Deployment**: Vercel
+- **Deployment**: Render.com
 
 ## セットアップ
 
@@ -50,16 +50,14 @@ http://localhost:3000 でアプリケーションが起動します。
 
 ## デプロイ
 
-### Vercelへのデプロイ
+### Render.comへのデプロイ（推奨）
 
 1. GitHubにリポジトリをプッシュ
-2. Vercelでプロジェクトをインポート
+2. Render.comでプロジェクトをインポート
 3. 環境変数を設定
 4. デプロイ
 
-```bash
-vercel --prod
-```
+詳細は`DEPLOY_INSTRUCTIONS.md`を参照してください。
 
 ## 主な機能
 
@@ -114,11 +112,12 @@ npm run lint
 
 - このMVP版は検証目的のみ
 - 実際の決済処理は実装されていません（モック）
-- Vercel Hobbyプランは商用利用不可
+- 商用利用時は適切なプラン選択が必要
 - 必ず利用規約とプライバシーポリシーを作成してください
-## キャッシュクリア後の再デプロイ 2025-07-08_21:41:00
+
+## 更新履歴
 
 - ローカルキャッシュをクリア
 - node_modules再インストール
 - Next.js設定を簡素化
-- Vercelビルドエラー修正
+- デプロイ環境の最適化
