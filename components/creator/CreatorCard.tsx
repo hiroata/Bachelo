@@ -17,21 +17,23 @@ export default function CreatorCard({ creator }: CreatorCardProps) {
             {creator.avatar_url ? (
               <img
                 src={creator.avatar_url}
-                alt={creator.display_name}
+                alt={creator.display_name || ''}
                 className="w-16 h-16 rounded-full object-cover"
               />
             ) : (
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white text-xl font-bold">
-                {creator.display_name[0]}
+                {creator.display_name?.[0] || creator.username?.[0] || '?'}
               </div>
             )}
           </div>
           
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900">
-              {creator.display_name}
+              {creator.display_name || creator.username || '未設定'}
             </h3>
-            <p className="text-sm text-gray-500">@{creator.username}</p>
+            {creator.username && (
+              <p className="text-sm text-gray-500">@{creator.username}</p>
+            )}
             
             {creator.bio && (
               <p className="mt-2 text-sm text-gray-600 line-clamp-2">

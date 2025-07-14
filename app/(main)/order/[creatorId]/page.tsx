@@ -213,7 +213,7 @@ export default function OrderPage({ params }: PageProps) {
                   <li>音声は10秒以内で収録されます</li>
                   <li>過度に性的な表現や違法な内容は禁止です</li>
                   <li>納品後のキャンセル・返金はできません</li>
-                  <li>納期は通常{creator.average_delivery_hours}時間以内です</li>
+                  <li>納期は通常{creator.average_delivery_hours || 24}時間以内です</li>
                 </ul>
               </div>
             </div>

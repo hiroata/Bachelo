@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@supabase/supabase-js';
+
+export const dynamic = 'force-dynamic';
 
 // トレンド投稿取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     const { searchParams } = new URL(request.url);
     
     const timeframe = searchParams.get('timeframe') || '24h'; // 24h, 7d, 30d
@@ -67,9 +71,12 @@ export async function GET(request: NextRequest) {
 }
 
 // トレンドデータ更新（バックグラウンド処理用）
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     
     // トレンドトピック分析
     await analyzeTrendingTopics(supabase);
@@ -101,7 +108,7 @@ async function analyzeTrendingTopics(supabase: any) {
     
     posts.forEach(post => {
       const text = `${post.title} ${post.content}`.toLowerCase();
-      const words = text.match(/[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf\w]+/g) || [];
+      const words: string[] = text.match(/[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf\w]+/g) || [];
       
       words.forEach(word => {
         if (word.length >= 2 && word.length <= 10) {
@@ -124,7 +131,7 @@ async function analyzeTrendingTopics(supabase: any) {
     });
 
     // トレンドトピックをデータベースに保存
-    for (const [keyword, data] of keywordCounts) {
+    for (const [keyword, data] of Array.from(keywordCounts.entries())) {
       if (data.mention_count >= 3) { // 3回以上言及されたもののみ
         await supabase
           .from('trending_topics')

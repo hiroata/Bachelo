@@ -178,7 +178,7 @@ export default function OrdersPage() {
                   
                   <div className="mt-4 flex items-center justify-between">
                     <div className="text-lg font-semibold">
-                      ¥{order.price.toLocaleString()}
+                      ¥{(order.price || order.amount).toLocaleString()}
                     </div>
                     
                     <div className="flex items-center space-x-2">

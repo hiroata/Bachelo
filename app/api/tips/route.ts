@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { createRouteHandlerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 

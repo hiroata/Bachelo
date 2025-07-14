@@ -1,5 +1,6 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
+
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { Database } from '@/types/database'
@@ -11,7 +12,7 @@ const createOrderSchema = z.object({
 })
 
 export async function POST(request: Request) {
-  const supabase = createRouteHandlerClient<Database>({ cookies })
+  const supabase = createClient()
   
   // 認証確認
   const { data: { user } } = await supabase.auth.getUser()
@@ -116,7 +117,7 @@ async function cancelPayment(paymentId: string) {
 }
 
 export async function GET(request: Request) {
-  const supabase = createRouteHandlerClient<Database>({ cookies })
+  const supabase = createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {

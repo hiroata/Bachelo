@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
     
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     
     // ポイント履歴を追加
     const { error: historyError } = await supabase
@@ -178,7 +178,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 });
     }
     
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     
     const { data: profile, error } = await supabase
       .from('user_profiles')

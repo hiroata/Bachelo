@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+
+export const dynamic = 'force-dynamic';
+import { createClient } from '@/lib/supabase/server';
+
 import { z } from 'zod';
 
 // リアクション追加/削除のスキーマ
@@ -17,7 +19,7 @@ const reactionSchema = z.object({
 // リアクション追加/削除
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     const body = await request.json();
     const { postId, replyId, reactionType, userId, action } = reactionSchema.parse(body);
     
@@ -81,7 +83,7 @@ export async function POST(request: NextRequest) {
 // リアクション統計取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     const { searchParams } = new URL(request.url);
     const postId = searchParams.get('postId');
     const replyId = searchParams.get('replyId');

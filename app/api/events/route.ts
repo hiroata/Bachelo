@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+
+export const dynamic = 'force-dynamic';
+import { createClient } from '@/lib/supabase/server';
+
 import { z } from 'zod';
 
 // イベント作成スキーマ
@@ -31,7 +33,7 @@ const participationSchema = z.object({
 // イベント一覧取得
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     const { searchParams } = new URL(request.url);
     
     const status = searchParams.get('status'); // 'active', 'planned', 'ended'
@@ -86,7 +88,7 @@ export async function GET(request: NextRequest) {
 // イベント作成
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     const body = await request.json();
     
     const eventData = eventCreateSchema.parse(body);
@@ -137,7 +139,7 @@ export async function POST(request: NextRequest) {
 // イベント参加
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     const body = await request.json();
     
     const { eventId, userId, displayName, submissionPostId } = participationSchema.parse(body);
