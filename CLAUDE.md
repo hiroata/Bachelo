@@ -1,88 +1,111 @@
-# Bachelo - プロジェクトコンテキスト
+# 🔞 Adult BBS System - Claude Development Guide
 
-## 🎯 プロジェクト概要
+## ⚠️ 系統概要
+**アダルト専用掲示板システム** - すべての性癖に対応した包括的カテゴリー設計
 
-Bachelo（バチェロ）は、匿名で投稿できる無料音声掲示板を中心とした、アダルトボイスマーケットプレイスです。
+### 🎯 コアミッション
+- 17主要カテゴリ + 100+サブカテゴリで全性癖をカバー
+- マルチレイヤー保護システム（健全化防止）
+- Firebase/Vercel完全除去済み
+- Render.com統一デプロイ戦略
 
-**コアコンセプト**: 無料音声掲示板で気に入った声を見つけて → 有料でカスタムボイスをリクエスト
+## 📊 技術スタック状況
 
-## 🏗️ 技術スタック
+### ✅ 採用技術
+- **Next.js 14** (TypeScript)
+- **Supabase PostgreSQL** (with TEXT[] arrays)
+- **Render.com** (デプロイ)
+- **GitHub** (https://github.com/hiroata/Bachelo.git)
 
-```
-Frontend:  Next.js 14.2.30 (App Router) + TypeScript 5 + Tailwind CSS 3.4
-Backend:   Next.js API Routes
-Database:  Supabase (PostgreSQL)
-Storage:   Supabase Storage
-Auth:      Supabase Auth
-Deploy:    Render.com
-```
+### ❌ 除去済み技術
+- Firebase (完全削除)
+- Vercel (完全削除)
+- 健全コンテンツ (完全排除)
 
-## 🚀 実装済み機能
+## 🔐 保護システム概要
 
-### ✅ コア機能
-1. **音声掲示板**
-   - カテゴリー別表示（女性/男性/カップル）
-   - 匿名投稿機能
-   - 音声再生プレイヤー
-   - リアルタイム更新 (Supabase Realtime)
+### データベース保護
+```sql
+-- カテゴリー削除防止制約
+ALTER TABLE adult_categories ADD CONSTRAINT prevent_wholesome_categories 
+CHECK (name NOT LIKE '%wholesome%' AND name NOT LIKE '%family%');
 
-2. **テキスト掲示板**
-   - カテゴリー別投稿
-   - 画像アップロード（最大4枚、各5MB以下）
-   - 返信スレッド機能
-   - 投票システム（+/-ボタン）
-   - リアルタイム返信数カウント
-   - ページネーション
-
-3. **データ永続化**
-   - Supabase Storage統合
-   - PostgreSQLデータベース
-   - Row Level Security (RLS)
-   - 自動クリーンアップ機能
-
-4. **セキュリティ**
-   - ファイル検証（形式・サイズ）
-   - IPアドレスハッシュ化
-   - XSS対策（DOMPurify）
-   - レート制限
-   - CSRFトークン検証
-   - 年齢確認ゲート（middleware）
-
-## 📝 重要なコマンド
-
-```bash
-# 開発サーバー起動
-npm run dev
-
-# 型チェック
-npm run type-check
-
-# リント
-npm run lint
-
-# ビルド
-npm run build
-
-# 本番サーバー起動
-npm start
-
-# データベースシード
-npm run seed:board      # 掲示板の初期データ投入
-npm run seed:replies    # 返信データの投入
-npm run update:reply-counts  # 返信数の更新
+-- 管理者権限制限
+ALTER TABLE users ADD CONSTRAINT admin_protection 
+CHECK (role = 'admin' AND approved_adult_content = true);
 ```
 
-## 🎨 デザイン原則
+### TypeScript保護
+```typescript
+// 健全化防止バリデーション
+export const validateAdultCategory = (category: string): boolean => {
+  const forbiddenTerms = ['wholesome', 'family-friendly', 'clean'];
+  return !forbiddenTerms.some(term => category.toLowerCase().includes(term));
+};
+## 📁 主要ファイル構造
 
-- **メインカラー**: ピンク（#ec4899）
-- **レイアウト**: モバイルファースト、レスポンシブ
-- **インタラクション**: 直感的、最小限のクリック
-- **パフォーマンス**: 遅延読み込み、最適化されたレンダリング
+### 重要実装ファイル
 
-## 🔄 主要なファイル構成
+- `supabase/migrations/ultra-detailed-adult-categories-fixed-v2.sql`
+- `data/ultra-detailed-adult-categories.ts`  
+- `lib/protection-system.ts`
+- `components/auth/adult-verification.tsx`
 
-```
-/Bachelo/
+### 設定ファイル
+
+- `render.yaml` (デプロイ設定)
+- `.gitignore` (Firebase/Vercelブロック)
+- `package.json` (依存関係)
+
+## 🚀 開発履歴
+
+### 2024年12月22日 - Day 3
+
+#### 23:30 - ドキュメント統合作業
+
+- 重複markdownファイル統合
+- AI参照用最適化
+- 不要ファイル削除
+
+#### 23:00 - システム最終クリーンアップ完了
+
+1. **Firebase完全除去**
+   - firebase-debug.log削除
+   - .firebase/ディレクトリ削除
+   - 全依存関係除去
+
+2. **Vercel完全削除**
+   - vercel.json削除
+   - README/DEPLOY等からVercel参照削除
+   - Render.com戦略に統一
+
+3. **Git履歴整理**
+   - 単一クリーンコミットに圧縮
+   - 大容量ファイル除去
+   - メインブランチにプッシュ
+
+#### 22:00 - 保護システム強化
+
+- データベース制約強化
+- TypeScript型保護追加
+- ドキュメント保護実装
+
+### ⚠️ 重要な制限事項
+
+1. **システム変更禁止**
+   - 健全コンテンツへの変更は完全禁止
+   - アダルト専用システムとして固定
+   - 保護メカニズムの削除禁止
+
+2. **技術制約**
+   - Firebase使用禁止（完全除去済み）
+   - Vercel使用禁止（完全除去済み）
+   - Render.com必須使用
+
+3. **デプロイメント**
+   - GitHub: https://github.com/hiroata/Bachelo.git
+   - メインブランチのみ使用
+   - Render.com経由でのみデプロイ
 ├── app/
 │   ├── (main)/
 │   │   ├── voice-board/           # 音声掲示板ページ
