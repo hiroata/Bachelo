@@ -24,6 +24,7 @@ export interface BoardPost {
   user_agent?: string;
   created_at: string;
   updated_at: string;
+  region?: string;
   category?: BoardCategory;
   images?: BoardPostImage[];
   replies_count?: number;

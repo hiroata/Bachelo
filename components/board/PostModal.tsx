@@ -26,6 +26,7 @@ function PostModal({
     author_email: '',
     title: defaultTitle,
     content: '',
+    region: '全国',
   });
   const [loading, setLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -230,6 +231,28 @@ function PostModal({
                         {category.icon ? `${category.icon} ${category.name}` : category.name}
                       </option>
                     ))}
+                  </select>
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-3 pr-4 text-right font-bold">地域</td>
+                <td className="py-3">
+                  <select
+                    value={formData.region}
+                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                    className="px-3 py-2 border rounded"
+                    style={{ backgroundColor: '#FFE4E1' }}
+                  >
+                    <option value="全国">全国</option>
+                    <option value="北海道">北海道</option>
+                    <option value="東北">東北</option>
+                    <option value="関東">関東</option>
+                    <option value="中部">中部</option>
+                    <option value="関西">関西</option>
+                    <option value="中国">中国</option>
+                    <option value="四国">四国</option>
+                    <option value="九州">九州</option>
+                    <option value="沖縄">沖縄</option>
                   </select>
                 </td>
               </tr>

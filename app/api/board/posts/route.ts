@@ -14,6 +14,7 @@ const createPostSchema = z.object({
   author_email: z.string().email().optional(),
   title: z.string().min(1).max(200),
   content: z.string().min(1).max(10000),
+  region: z.string().optional().default('全国'),
 });
 
 export async function GET(request: NextRequest) {
@@ -23,6 +24,7 @@ export async function GET(request: NextRequest) {
     const per_page = parseInt(searchParams.get('per_page') || '20');
     const category_id = searchParams.get('category_id');
     const search = searchParams.get('search');
+    const region = searchParams.get('region');
     
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,6 +42,10 @@ export async function GET(request: NextRequest) {
     
     if (category_id) {
       query = query.eq('category_id', category_id);
+    }
+    
+    if (region) {
+      query = query.eq('region', region);
     }
     
     if (search) {

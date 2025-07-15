@@ -87,47 +87,17 @@ export default function RegionalDetailPage() {
   const fetchRegionalPosts = async () => {
     setLoading(true);
     try {
-      // 地域の都市名で投稿を検索
-      const allPosts = [];
+      // 地域名でフィルタリング
+      const regionName = region.name;
+      const response = await fetch(`/api/board/posts?region=${encodeURIComponent(regionName)}&per_page=100`);
+      const data = await response.json();
       
-      // 各都市名で検索
-      for (const city of region.cities) {
-        const response = await fetch(`/api/board/posts?search=${encodeURIComponent(city)}&per_page=50`);
-        const data = await response.json();
-        
-        if (data.posts && data.posts.length > 0) {
-          // 各投稿にcityとtypeを追加
-          const cityPosts = data.posts.map((post: any) => {
-            // タイトルから都市名を抽出
-            const cityMatch = post.title.match(/【([^】]+)】/);
-            const postCity = cityMatch ? cityMatch[1] : city;
-            
-            // タイトルまたは内容からタイプを推測
-            let postType = '即会い';
-            if (post.title.includes('セフレ') || post.content.includes('セフレ')) postType = 'セフレ';
-            else if (post.title.includes('不倫') || post.content.includes('不倫')) postType = '不倫';
-            else if (post.title.includes('パパ活') || post.content.includes('パパ活')) postType = 'パパ活';
-            else if (post.title.includes('SM') || post.content.includes('SM')) postType = 'SM';
-            else if (post.title.includes('デート') || post.content.includes('デート')) postType = 'デート';
-            
-            return {
-              ...post,
-              city: postCity,
-              type: postType
-            };
-          });
-          allPosts.push(...cityPosts);
-        }
+      if (data.posts && data.posts.length > 0) {
+        setPosts(data.posts);
+      } else {
+        setPosts([]);
       }
-      
-      // 重複を削除（同じIDの投稿を除外）
-      const uniquePosts = allPosts.filter((post, index, self) =>
-        index === self.findIndex((p) => p.id === post.id)
-      );
-      
-      setPosts(uniquePosts);
     } catch (error) {
-      console.error('Error fetching posts:', error);
       // エラー時はモックデータのみ
       setPosts(generateMockPosts());
     } finally {
