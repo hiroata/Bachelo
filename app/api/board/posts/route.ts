@@ -52,7 +52,15 @@ export async function GET(request: NextRequest) {
     const { data: posts, error, count } = await query.range(from, to);
     
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Board posts query error:', error);
+      return NextResponse.json({ 
+        error: error.message,
+        details: {
+          code: error.code,
+          hint: error.hint,
+          table: 'board_posts'
+        }
+      }, { status: 500 });
     }
     
     // 各投稿の返信数を取得
