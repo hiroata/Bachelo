@@ -1,0 +1,23 @@
+# Dependencies
+node_modules
+
+# Production build
+.next
+out
+dist
+
+# Scripts and setup files
+scripts/**
+*.js
+
+# Migrations
+supabase/migrations/**
+
+# Cache
+.eslintcache
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx

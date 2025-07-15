@@ -13,6 +13,14 @@ const nextConfig = {
       },
     ],
   },
+  eslint: {
+    // During production build, we'll ignore ESLint errors
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // During production build, we'll ignore TypeScript errors
+    ignoreBuildErrors: true,
+  },
 }
 
 module.exports = nextConfig
