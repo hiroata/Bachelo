@@ -14,7 +14,7 @@ async function checkRegionalPosts() {
     const { data: categories } = await supabase
       .from('board_categories')
       .select('*')
-      .or('slug.eq.regional,slug.eq.region,name.eq.地域');
+      .or('slug.eq.regional-adult,slug.eq.regional,slug.eq.region,name.ilike.%地域%');
     
     console.log('📁 地域カテゴリー:', categories);
     

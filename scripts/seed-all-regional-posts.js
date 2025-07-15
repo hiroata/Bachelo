@@ -528,7 +528,7 @@ async function seedAllRegionalPosts() {
     const { data: categories, error: catError } = await supabase
       .from('board_categories')
       .select('*')
-      .or('slug.eq.regional,slug.eq.region,slug.eq.local,name.eq.地域');
+      .or('slug.eq.regional-adult,slug.eq.regional,slug.eq.region,slug.eq.local,name.ilike.%地域%');
     
     if (catError) {
       console.error('❌ カテゴリー取得エラー:', catError);
@@ -544,9 +544,9 @@ async function seedAllRegionalPosts() {
       const { data: newCategory, error: createError } = await supabase
         .from('board_categories')
         .insert({
-          name: '地域',
-          slug: 'regional',
-          description: '地域別の掲示板',
+          name: '地域・エロ出会い',
+          slug: 'regional-adult',
+          description: '地域別のアダルト出会い掲示板',
           icon: '🗾',
           is_active: true
         })
