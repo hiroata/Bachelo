@@ -81,9 +81,21 @@ export async function GET(request: NextRequest) {
       hasMore: (notifications?.length || 0) === params.limit
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Notifications GET error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    
+    // テーブルが存在しない場合は空の結果を返す
+    if (error?.message?.includes('does not exist')) {
+      return NextResponse.json({
+        notifications: [],
+        unreadCount: 0,
+        hasMore: false
+      });
+    }
+    
+    return NextResponse.json({ 
+      error: error?.message || 'Internal server error' 
+    }, { status: 500 });
   }
 }
 

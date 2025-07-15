@@ -36,7 +36,6 @@ export async function GET(request: NextRequest) {
         category:board_categories(*),
         images:board_post_images(*)
       `, { count: 'exact' })
-      .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false });
     
     if (category_id) {

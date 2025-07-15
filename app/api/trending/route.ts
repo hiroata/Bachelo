@@ -64,9 +64,22 @@ export async function GET(request: NextRequest) {
       total: posts?.length || 0
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Trending API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    
+    // ビューが存在しない場合は空の結果を返す
+    if (error?.message?.includes('does not exist')) {
+      return NextResponse.json({
+        posts: [],
+        topics: [],
+        timeframe,
+        total: 0
+      });
+    }
+    
+    return NextResponse.json({ 
+      error: error?.message || 'Internal server error' 
+    }, { status: 500 });
   }
 }
 

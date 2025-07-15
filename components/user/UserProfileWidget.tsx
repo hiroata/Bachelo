@@ -74,15 +74,15 @@ export default function UserProfileWidget() {
       
       setTopUsers(topUsersData || []);
       
-      // 今月のMVP取得
-      const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
-      const { data: mvpData } = await supabase
-        .from('monthly_mvp')
-        .select('*')
-        .eq('month', currentMonth)
-        .single();
+      // 今月のMVP取得（テーブルが存在しない場合はスキップ）
+      // const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
+      // const { data: mvpData } = await supabase
+      //   .from('monthly_mvp')
+      //   .select('*')
+      //   .eq('month', currentMonth)
+      //   .single();
       
-      setMonthlyMVP(mvpData);
+      // setMonthlyMVP(mvpData);
       
     } catch (error) {
       console.error('Error loading user data:', error);
