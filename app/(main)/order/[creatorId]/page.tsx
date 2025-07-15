@@ -137,17 +137,17 @@ export default function OrderPage({ params }: PageProps) {
             {creator.avatar_url ? (
               <img
                 src={creator.avatar_url}
-                alt={creator.display_name}
+                alt={creator.display_name || 'Creator'}
                 className="w-16 h-16 rounded-full object-cover"
               />
             ) : (
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white text-xl font-bold">
-                {creator.display_name[0]}
+                {creator.display_name?.[0] || 'C'}
               </div>
             )}
             
             <div className="flex-1">
-              <h2 className="text-xl font-semibold">{creator.display_name}</h2>
+              <h2 className="text-xl font-semibold">{creator.display_name || 'Unknown Creator'}</h2>
               <p className="text-gray-500">@{creator.username}</p>
             </div>
             

@@ -67,10 +67,18 @@ export async function POST(request: NextRequest) {
         
         // データベースに保存
         if (postId) {
-          const insertData = {
+          const insertData: {
+            post_id: string;
+            image_url: string;
+            thumbnail_url: string;
+            file_size: number;
+            mime_type: string;
+            display_order: number;
+            storage_provider: string;
+          } = {
             post_id: postId,
             image_url: imageUrl,
-            thumbnail_url: thumbnailUrl,
+            thumbnail_url: thumbnailUrl || imageUrl,
             file_size: file.size,
             mime_type: file.type,
             display_order: uploadedImages.length,

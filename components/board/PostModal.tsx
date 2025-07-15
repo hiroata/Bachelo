@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import { BoardCategory } from '@/types/board';
 import { toast } from 'react-hot-toast';
 import { X, Image as ImageIcon, Upload } from 'lucide-react';
@@ -14,7 +14,7 @@ interface PostModalProps {
   defaultTitle?: string;
 }
 
-export default function PostModal({
+function PostModal({
   categories,
   onClose,
   onSuccess,
@@ -35,7 +35,7 @@ export default function PostModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 画像選択処理
-  const handleImageSelect = (files: FileList | null) => {
+  const handleImageSelect = useCallback((files: FileList | null) => {
     if (!files) return;
 
     const newFiles = Array.from(files);
@@ -71,13 +71,13 @@ export default function PostModal({
     });
 
     setSelectedImages(prev => [...prev, ...filesToAdd]);
-  };
+  }, []);
 
   // 画像削除処理
-  const removeImage = (index: number) => {
+  const removeImage = useCallback((index: number) => {
     setSelectedImages(prev => prev.filter((_, i) => i !== index));
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
-  };
+  }, []);
 
   // ドラッグ&ドロップ処理
   const handleDragOver = (e: React.DragEvent) => {
@@ -361,3 +361,5 @@ export default function PostModal({
     </div>
   );
 }
+
+export default memo(PostModal);

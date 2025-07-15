@@ -63,22 +63,13 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
     
-    // 各投稿の返信数を取得
-    const postsWithReplyCounts = await Promise.all(
-      (posts || []).map(async (post) => {
-        const { count: replyCount } = await supabase
-          .from('board_replies')
-          .select('*', { count: 'exact', head: true })
-          .eq('post_id', post.id);
-        
-        return {
-          ...post,
-          replies_count: replyCount || 0
-        };
-      })
-    );
-    
     const total_pages = Math.ceil((count || 0) / per_page);
+    
+    // Use the existing reply_count column from board_posts table
+    const postsWithReplyCounts = (posts || []).map(post => ({
+      ...post,
+      replies_count: post.reply_count || 0
+    }));
     
     return NextResponse.json({
       posts: postsWithReplyCounts,

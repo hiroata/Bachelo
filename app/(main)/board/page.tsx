@@ -55,13 +55,10 @@ function BoardContent() {
       try {
         const response = await fetch('/api/board/categories');
         if (!response.ok) {
-          console.error('Failed to fetch categories:', response.status);
           // テーブルが存在しない可能性があるので、自動セットアップを試みる
           if (response.status === 500) {
-            console.log('🔧 掲示板のセットアップを試みます...');
             const setupResponse = await fetch('/api/setup/board');
             if (setupResponse.ok) {
-              console.log('✅ セットアップ完了！カテゴリーを再取得します...');
               // セットアップ後に再度カテゴリーを取得
               const retryResponse = await fetch('/api/board/categories');
               if (retryResponse.ok) {
@@ -80,11 +77,9 @@ function BoardContent() {
         if (Array.isArray(data)) {
           setCategories(data);
         } else {
-          console.error('Categories response is not an array:', data);
           setCategories([]);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
         setCategories([]);
       }
     };
@@ -109,30 +104,17 @@ function BoardContent() {
           'Cache-Control': 'no-cache',
         },
       });
-      console.log('API Response Status:', response.status, response.statusText);
-      
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('API Error Response:', errorData);
-        console.error('Request URL:', `/api/board/posts?${params}`);
         throw new Error(`Failed to fetch posts: ${response.status} ${errorData}`);
       }
       
       const data = await response.json();
-      console.log('✅ API Response Success:', {
-        url: `/api/board/posts?${params}`,
-        postsCount: data.posts?.length || 0,
-        total: data.total || 0,
-        firstPost: data.posts?.[0]?.title,
-        fullResponse: data
-      });
       
       setPosts(data.posts || []);
       setTotalPages(data.total_pages || 1);
       setTotalPosts(data.total || 0);
     } catch (error) {
-      console.error('Error fetching posts:', error);
-      
       // APIエラー時は緊急用のモックデータを表示
       const emergencyPosts = [
         {
@@ -212,7 +194,6 @@ function BoardContent() {
         }
       ];
       
-      console.log('Using emergency mock data due to API failure');
       setPosts(emergencyPosts);
       setTotalPages(1);
       setTotalPosts(emergencyPosts.length);
@@ -252,27 +233,19 @@ function BoardContent() {
           : post
       ));
     } catch (error) {
-      console.error('Error voting:', error);
+      // Error voting - could show toast notification
     }
   };
 
   const sortedPosts = [...posts].sort((a, b) => {
     if (selectedTab === 'popular') {
-      return (b.plus_count - b.minus_count) - (a.plus_count - a.minus_count);
+      return ((b.plus_count || 0) - (b.minus_count || 0)) - ((a.plus_count || 0) - (a.minus_count || 0));
     }
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
-  // デバッグログ
-  console.log('Board Page Debug:', {
-    loading,
-    postsLength: posts.length,
-    sortedPostsLength: sortedPosts.length,
-    selectedTab,
-    categoryId,
-    searchQuery,
-    posts: posts.slice(0, 3).map(p => ({ id: p.id, title: p.title }))
-  });
+  // Debug info available for development
+  // Posts: ${posts.length}, Sorted: ${sortedPosts.length}, Tab: ${selectedTab}
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -317,7 +290,6 @@ function BoardContent() {
       // 投稿一覧を再取得
       fetchPosts();
     } catch (error) {
-      console.error('Error deleting post:', error);
       toast.error(error instanceof Error ? error.message : '削除に失敗しました');
     } finally {
       setDeletingPost(false);
@@ -571,7 +543,7 @@ function BoardContent() {
                             </div>
                             {/* ホバー時の拡大プレビュー */}
                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity rounded-lg"></div>
-                            {idx === 3 && post.images.length > 4 && (
+                            {idx === 3 && post.images && post.images.length > 4 && (
                               <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center text-white font-bold">
                                 +{post.images.length - 4}
                               </div>
@@ -580,7 +552,7 @@ function BoardContent() {
                         ))}
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
-                        画像 {post.images.length}枚
+                        画像 {post.images?.length || 0}枚
                       </p>
                     </div>
                   )}

@@ -35,13 +35,13 @@ export default function BoardRankingPage() {
         let score = 0;
         switch (category) {
           case 'trending':
-            score = post.view_count + (post.plus_count * 10) + (post.replies_count || 0) * 5;
+            score = post.view_count + ((post.plus_count || 0) * 10) + (post.replies_count || 0) * 5;
             break;
           case 'most_viewed':
             score = post.view_count;
             break;
           case 'most_liked':
-            score = post.plus_count - post.minus_count;
+            score = (post.plus_count || 0) - (post.minus_count || 0);
             break;
           case 'most_replied':
             score = post.replies_count || 0;
