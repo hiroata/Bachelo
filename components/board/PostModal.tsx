@@ -5,6 +5,7 @@ import { BoardCategory } from '@/types/board';
 import { toast } from 'react-hot-toast';
 import { X, Image as ImageIcon, Upload } from 'lucide-react';
 import StorageProviderSelector, { StorageProvider } from './StorageProviderSelector';
+import AIAssistPanel from '@/components/ai/AIAssistPanel';
 
 interface PostModalProps {
   categories: BoardCategory[];
@@ -243,6 +244,23 @@ export default function PostModal({
                     required
                     style={{ backgroundColor: '#FFE4E1' }}
                   />
+                  
+                  {/* AIアシストパネル */}
+                  <div className="mt-4">
+                    <AIAssistPanel
+                      onTextGenerated={(text) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          content: prev.content + '\n\n' + text
+                        }));
+                      }}
+                      onImageGenerated={(images) => {
+                        handleImageSelect(images as any);
+                      }}
+                      initialPrompt={formData.title}
+                      category={categories.find(c => c.id === formData.category_id)?.name || ''}
+                    />
+                  </div>
                 </td>
               </tr>
               <tr className="border-b">
