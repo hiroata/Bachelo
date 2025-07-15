@@ -5,14 +5,15 @@ export const dynamic = 'force-dynamic';
 
 // トレンド投稿取得
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const timeframe = searchParams.get('timeframe') || '24h'; // 24h, 7d, 30d
+  
   try {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    const { searchParams } = new URL(request.url);
     
-    const timeframe = searchParams.get('timeframe') || '24h'; // 24h, 7d, 30d
     const category = searchParams.get('category');
     const limit = parseInt(searchParams.get('limit') || '20');
 
