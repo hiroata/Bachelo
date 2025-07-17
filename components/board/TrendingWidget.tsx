@@ -51,10 +51,30 @@ export default function TrendingWidget() {
     try {
       setLoading(true);
       const response = await fetch(`/api/trending?timeframe=${timeframe}&limit=10`);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch trending data:', response.statusText);
+        // Set empty data on error
+        setTrendingData({
+          posts: [],
+          topics: [],
+          timeframe: timeframe,
+          total: 0
+        });
+        return;
+      }
+      
       const data = await response.json();
       setTrendingData(data);
     } catch (error) {
       console.error('Failed to fetch trending data:', error);
+      // Set empty data on error
+      setTrendingData({
+        posts: [],
+        topics: [],
+        timeframe: timeframe,
+        total: 0
+      });
     } finally {
       setLoading(false);
     }

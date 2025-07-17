@@ -90,6 +90,16 @@ export default function NotificationCenter({ userId, className = '' }: Notificat
       });
 
       const response = await fetch(`/api/notifications?${params}`);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch notifications:', response.statusText);
+        // Return empty data on error
+        setNotifications([]);
+        setUnreadCount(0);
+        setHasMore(false);
+        return;
+      }
+      
       const data = await response.json();
 
       if (offset === 0) {

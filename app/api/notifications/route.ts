@@ -46,11 +46,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('user_notifications')
-      .select(`
-        *,
-        related_post:board_posts(id, title),
-        related_user:user_profiles!related_user_id(display_name)
-      `)
+      .select('*')
       .eq('user_id', params.userId)
       .order('created_at', { ascending: false })
       .range(params.offset, params.offset + params.limit - 1);

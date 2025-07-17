@@ -30,18 +30,23 @@ export async function GET(request: NextRequest) {
     // トレンド投稿クエリ構築
     let query = supabase
       .from('trending_posts_view')
-      .select(`
-        *,
-        board_categories!inner(name, icon),
-        post_tags(tag)
-      `)
+      .select('*')
       .gte('created_at', `now() - interval '${interval}'`)
       .order('trend_score', { ascending: false })
       .limit(limit);
 
     // カテゴリフィルタ
     if (category) {
-      query = query.eq('board_categories.name', category);
+      // カテゴリ名でフィルタする場合は、まずカテゴリIDを取得
+      const { data: categoryData } = await supabase
+        .from('board_categories')
+        .select('id')
+        .eq('name', category)
+        .single();
+      
+      if (categoryData) {
+        query = query.eq('category_id', categoryData.id);
+      }
     }
 
     const { data: posts, error } = await query;
@@ -121,11 +126,16 @@ async function analyzeTrendingTopics(supabase: any) {
     const keywordCounts = new Map<string, any>();
     
     posts.forEach(post => {
-      const text = `${post.title} ${post.content}`.toLowerCase();
-      const words: string[] = text.match(/[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf\w]+/g) || [];
+      // Ensure post has required fields
+      if (!post || !post.title) return;
+      
+      const content = post.content || '';
+      const text = `${post.title} ${content}`.toLowerCase();
+      const matches = text.match(/[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf\w]+/g);
+      const words: string[] = matches ? matches : [];
       
       words.forEach(word => {
-        if (word.length >= 2 && word.length <= 10) {
+        if (word && word.length >= 2 && word.length <= 10) {
           if (!keywordCounts.has(word)) {
             keywordCounts.set(word, {
               keyword: word,
@@ -137,9 +147,13 @@ async function analyzeTrendingTopics(supabase: any) {
           }
           
           const data = keywordCounts.get(word);
-          data.mention_count++;
-          data.engagement_score += (post.reply_count * 2 + post.view_count * 0.1 + post.plus_count);
-          data.related_posts.push(post.id);
+          if (data) {
+            data.mention_count++;
+            data.engagement_score += ((post.reply_count || 0) * 2 + (post.view_count || 0) * 0.1 + (post.plus_count || 0));
+            if (data.related_posts && data.related_posts.length < 50) { // Limit array size
+              data.related_posts.push(post.id);
+            }
+          }
         }
       });
     });
@@ -155,7 +169,7 @@ async function analyzeTrendingTopics(supabase: any) {
             mention_count: data.mention_count,
             engagement_score: data.engagement_score,
             velocity_score: data.engagement_score / Math.max(1, Date.now() - new Date(posts[0].created_at).getTime()),
-            related_posts: data.related_posts.slice(0, 10),
+            related_posts: data.related_posts ? data.related_posts.slice(0, 10) : [],
             trending_start: new Date().toISOString()
           }, {
             onConflict: 'keyword',
@@ -195,7 +209,7 @@ async function recalculateUserReputations(supabase: any) {
       const { data: reactions } = await supabase
         .from('post_reactions')
         .select('reaction_type')
-        .in('post_id', posts?.map(p => p.id) || []);
+        .in('post_id', posts && posts.length > 0 ? posts.map((p: any) => p.id) : ['00000000-0000-0000-0000-000000000000']);
 
       const postPoints = posts?.reduce((sum, p) => sum + (p.plus_count * 2 - p.minus_count), 0) || 0;
       const replyPoints = replies?.reduce((sum, r) => sum + (r.plus_count - r.minus_count), 0) || 0;
