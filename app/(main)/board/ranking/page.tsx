@@ -23,7 +23,13 @@ export default function BoardRankingPage() {
   const fetchRankings = async () => {
     setLoading(true);
     try {
-      const endpoint = category === 'trending' ? 'trending' : 'hot';
+      let endpoint = 'all-time';
+      if (category === 'trending') {
+        endpoint = 'trending';
+      } else if (timeRange === 'daily' || timeRange === 'weekly') {
+        endpoint = 'hot';
+      }
+      
       const response = await fetch(`/api/board/rankings/${endpoint}?range=${timeRange}`);
       
       if (!response.ok) throw new Error('Failed to fetch rankings');
@@ -31,7 +37,7 @@ export default function BoardRankingPage() {
       const data = await response.json();
       
       // ランキングスコアを計算してソート
-      const rankedPosts = data.posts.map((post: BoardPost, index: number) => {
+      const rankedPosts = (data.posts || []).map((post: BoardPost, index: number) => {
         let score = 0;
         switch (category) {
           case 'trending':

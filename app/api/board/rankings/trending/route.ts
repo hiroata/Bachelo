@@ -8,9 +8,9 @@ export async function GET() {
   try {
     const supabase = createClient();
     
-    // 過去3時間以内に作成された投稿を取得
-    const threeHoursAgo = new Date();
-    threeHoursAgo.setHours(threeHoursAgo.getHours() - 3);
+    // 過去7日以内に作成された投稿を取得（データがない場合は全期間）
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     
     const { data: posts, error } = await supabase
       .from('board_posts')
@@ -19,7 +19,7 @@ export async function GET() {
         category:board_categories(name, slug),
         replies:board_replies(count)
       `)
-      .gte('created_at', threeHoursAgo.toISOString())
+      .gte('created_at', sevenDaysAgo.toISOString())
       .order('view_count', { ascending: false })
       .limit(20);
 
