@@ -25,7 +25,8 @@
       "Bash(npm run query:*)",
       "Bash(npm run build:*)",
       "Bash(npx tsc:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(chmod:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
