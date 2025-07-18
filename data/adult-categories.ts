@@ -20,7 +20,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'incest',
     description: '禁断の世界、家族との体験談',
     color: 'red',
-    bgGradient: 'from-red-600 to-red-800',
+    bgGradient: 'from-rose-800 to-red-950',
     emoji: '🚫',
     isSpecial: true,
     ageRestricted: true
@@ -31,7 +31,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'exhibitionism',
     description: '露出体験談や目撃報告、スリルと興奮',
     color: 'yellow',
-    bgGradient: 'from-yellow-500 to-orange-600',
+    bgGradient: 'from-amber-700 to-orange-900',
     emoji: '👁️'
   },
   {
@@ -40,7 +40,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'acquaintance-wife',
     description: '人妻や熟女とのセックス体験、寝取られ体験',
     color: 'purple',
-    bgGradient: 'from-purple-600 to-pink-600',
+    bgGradient: 'from-purple-800 to-indigo-950',
     emoji: '💍'
   },
   {
@@ -49,7 +49,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'sm-dungeon',
     description: '陵辱を愛するSMマニアの集いの場',
     color: 'red',
-    bgGradient: 'from-red-700 to-black',
+    bgGradient: 'from-gray-900 to-black',
     emoji: '⛓️',
     isSpecial: true
   },
@@ -61,7 +61,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'lgbt',
     description: 'ゲイ・レズビアン体験や男装・女装体験',
     color: 'blue',
-    bgGradient: 'from-blue-600 to-purple-600',
+    bgGradient: 'from-blue-800 to-indigo-900',
     emoji: '🏳️‍🌈'
   },
   {
@@ -70,7 +70,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'masturbation',
     description: 'オナニーが大好きだと云う貴方の舌白',
     color: 'yellow',
-    bgGradient: 'from-yellow-400 to-orange-500',
+    bgGradient: 'from-orange-700 to-red-800',
     emoji: '💦'
   },
   {
@@ -79,7 +79,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'erotic-experience',
     description: 'あなたが体験したエッチな出来事',
     color: 'pink',
-    bgGradient: 'from-pink-500 to-red-500',
+    bgGradient: 'from-pink-700 to-rose-900',
     emoji: '💕'
   },
   {
@@ -88,7 +88,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'fetish-mania',
     description: 'エッチのこだわりや性癖',
     color: 'purple',
-    bgGradient: 'from-purple-700 to-indigo-800',
+    bgGradient: 'from-indigo-800 to-purple-950',
     emoji: '🎭'
   },
   
@@ -99,7 +99,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'rape-stories',
     description: '女性のレイプ体験、強姦体験',
     color: 'gray',
-    bgGradient: 'from-gray-700 to-gray-900',
+    bgGradient: 'from-slate-800 to-gray-950',
     emoji: '⚠️',
     isSpecial: true,
     ageRestricted: true
@@ -110,7 +110,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'school-girl',
     description: '友達の妹や生徒とのエッチ秘話',
     color: 'pink',
-    bgGradient: 'from-pink-400 to-pink-600',
+    bgGradient: 'from-pink-600 to-fuchsia-800',
     emoji: '🎒'
   },
   {
@@ -119,7 +119,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'massage',
     description: '普通のマッサージで思わず感じてしまった！',
     color: 'green',
-    bgGradient: 'from-green-500 to-teal-600',
+    bgGradient: 'from-teal-700 to-emerald-900',
     emoji: '💆'
   },
   {
@@ -128,7 +128,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'pickup-techniques',
     description: 'ナンパスポットやとっておきのナンパテク',
     color: 'blue',
-    bgGradient: 'from-blue-500 to-indigo-600',
+    bgGradient: 'from-sky-700 to-blue-900',
     emoji: '🎯'
   },
   
@@ -139,7 +139,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'adult-shop',
     description: '風俗に関する情報や体験談',
     color: 'yellow',
-    bgGradient: 'from-yellow-600 to-red-600',
+    bgGradient: 'from-amber-800 to-orange-950',
     emoji: '👑'
   },
   {
@@ -148,7 +148,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'erotic-novel',
     description: '様々なテーマの体験告白的な官能小説',
     color: 'red',
-    bgGradient: 'from-red-600 to-pink-700',
+    bgGradient: 'from-red-800 to-rose-950',
     emoji: '📚'
   },
   {
@@ -157,7 +157,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'voice-erotica',
     description: 'エロ声やオナニーボイス、喘ぎ声',
     color: 'purple',
-    bgGradient: 'from-purple-500 to-pink-500',
+    bgGradient: 'from-violet-700 to-purple-900',
     emoji: '🎙️'
   },
   {
@@ -166,7 +166,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'ero-board',
     description: '画像貼り付け掲示板、エロ画像をジャンル別に投稿',
     color: 'pink',
-    bgGradient: 'from-pink-600 to-purple-700',
+    bgGradient: 'from-fuchsia-700 to-purple-900',
     emoji: '🖼️'
   },
   
@@ -177,7 +177,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'ada-community',
     description: '地域でつながるコミュニティ掲示板',
     color: 'blue',
-    bgGradient: 'from-blue-400 to-green-500',
+    bgGradient: 'from-cyan-700 to-teal-900',
     emoji: '🗾'
   },
   {
@@ -186,7 +186,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'ero-activity',
     description: '性的嗜好・エロ活動',
     color: 'orange',
-    bgGradient: 'from-orange-500 to-red-600',
+    bgGradient: 'from-orange-700 to-red-900',
     emoji: '🔥'
   },
   {
@@ -195,7 +195,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'real-experience',
     description: '素人投稿のエロ体験談',
     color: 'red',
-    bgGradient: 'from-red-500 to-pink-600',
+    bgGradient: 'from-rose-700 to-pink-900',
     emoji: '📝'
   },
   {
@@ -204,7 +204,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'video-board',
     description: '撮影した動画を投稿',
     color: 'purple',
-    bgGradient: 'from-purple-600 to-indigo-700',
+    bgGradient: 'from-indigo-700 to-blue-950',
     emoji: '🎥'
   },
   
@@ -215,7 +215,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'nan-net-id',
     description: 'SNSコミュニティ',
     color: 'blue',
-    bgGradient: 'from-blue-500 to-cyan-600',
+    bgGradient: 'from-blue-700 to-sky-900',
     emoji: '🆔'
   },
   {
@@ -224,7 +224,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'general-navi',
     description: 'ナンネット総合案内',
     color: 'gray',
-    bgGradient: 'from-gray-600 to-gray-800',
+    bgGradient: 'from-slate-700 to-gray-900',
     emoji: '🧭'
   },
   {
@@ -233,7 +233,7 @@ export const adultCategories: AdultCategory[] = [
     slug: 'news',
     description: 'ナンネットのニュース掲示板',
     color: 'green',
-    bgGradient: 'from-green-600 to-teal-700',
+    bgGradient: 'from-emerald-700 to-green-950',
     emoji: '📰'
   }
 ];

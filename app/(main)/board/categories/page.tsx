@@ -66,21 +66,24 @@ export default function CategoriesPage() {
                 key={category.id}
                 href={`/board/category/${category.slug}`}
                 className={`
-                  relative overflow-hidden rounded-xl transition-all duration-300
-                  ${isHovered ? 'transform -translate-y-1 shadow-2xl' : 'shadow-lg'}
+                  relative overflow-hidden rounded-xl transition-all duration-300 border-2
+                  ${isHovered ? 'transform -translate-y-1 shadow-2xl scale-105' : 'shadow-lg'}
+                  ${category.isSpecial ? 'border-yellow-400' : 'border-transparent'}
                   bg-gradient-to-br ${category.bgGradient}
                 `}
                 onMouseEnter={() => setHoveredCategory(category.id)}
                 onMouseLeave={() => setHoveredCategory(null)}
               >
-                <div className="p-6 text-white relative z-10">
+                <div className="p-6 relative z-10">
+                  {/* Dark overlay for better text readability */}
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className={`
-                        p-3 rounded-lg bg-white/20 backdrop-blur-sm
-                        ${isHovered ? 'animate-pulse' : ''}
+                        p-3 rounded-lg bg-white/30 backdrop-blur-sm border border-white/50
+                        ${isHovered ? 'animate-pulse bg-white/40' : ''}
                       `}>
-                        <Icon className="w-6 h-6" />
+                        <Icon className="w-6 h-6 text-white" />
                       </div>
                       {category.emoji && (
                         <span className="text-2xl">{category.emoji}</span>
@@ -93,13 +96,13 @@ export default function CategoriesPage() {
                     )}
                   </div>
                   
-                  <h3 className="text-lg font-bold mb-2">{category.name}</h3>
-                  <p className="text-sm text-white/90 mb-3 line-clamp-2">
+                  <h3 className="text-lg font-bold mb-2 text-white drop-shadow-lg">{category.name}</h3>
+                  <p className="text-sm text-white/95 mb-3 line-clamp-2 drop-shadow">
                     {category.description}
                   </p>
                   
                   <div className="flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 text-white/90 font-medium">
                       <Users className="w-4 h-4" />
                       {postCounts[category.id]?.toLocaleString() || '0'} 投稿
                     </span>
