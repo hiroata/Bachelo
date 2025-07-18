@@ -28,15 +28,50 @@ export async function GET(request: NextRequest) {
     const interval = intervals[timeframe as keyof typeof intervals] || '24 hours';
 
     // トレンド投稿クエリ構築
-    let query = supabase
-      .from('trending_posts_view')
-      .select('*')
-      .gte('created_at', `now() - interval '${interval}'`)
-      .order('trend_score', { ascending: false })
-      .limit(limit);
+    // まずビューが存在するか確認し、存在しない場合は直接計算
+    let posts: any[] = [];
+    
+    try {
+      // trending_posts_viewから取得を試みる
+      const viewQuery = supabase
+        .from('trending_posts_view')
+        .select('*')
+        .gte('created_at', `now() - interval '${interval}'`)
+        .order('trend_score', { ascending: false })
+        .limit(limit);
+        
+      const { data: viewData, error: viewError } = await viewQuery;
+      
+      if (!viewError && viewData) {
+        posts = viewData;
+      } else {
+        throw new Error('View not available');
+      }
+    } catch (viewErr) {
+      // ビューが存在しない場合は直接計算
+      const directQuery = supabase
+        .from('board_posts')
+        .select('*')
+        .gte('created_at', `now() - interval '${interval}'`)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+        
+      const { data: directData, error: directError } = await directQuery;
+      
+      if (!directError && directData) {
+        // トレンドスコアを計算
+        posts = directData.map((post: any) => ({
+          ...post,
+          engagement_score: (post.view_count * 0.1 + post.reply_count * 2 + post.plus_count * 1.5 - post.minus_count * 0.5),
+          age_hours: (Date.now() - new Date(post.created_at).getTime()) / (1000 * 60 * 60),
+          trend_score: ((post.view_count * 0.1 + post.reply_count * 2 + post.plus_count * 1.5 - post.minus_count * 0.5) / 
+            (1 + (Date.now() - new Date(post.created_at).getTime()) / (1000 * 60 * 60)))
+        })).sort((a: any, b: any) => b.trend_score - a.trend_score);
+      }
+    }
 
     // カテゴリフィルタ
-    if (category) {
+    if (category && posts.length > 0) {
       // カテゴリ名でフィルタする場合は、まずカテゴリIDを取得
       const { data: categoryData } = await supabase
         .from('board_categories')
@@ -45,13 +80,9 @@ export async function GET(request: NextRequest) {
         .single();
       
       if (categoryData) {
-        query = query.eq('category_id', categoryData.id);
+        posts = posts.filter(post => post.category_id === categoryData.id);
       }
     }
-
-    const { data: posts, error } = await query;
-
-    if (error) throw error;
 
     // トレンドトピック取得
     const { data: topics, error: topicsError } = await supabase

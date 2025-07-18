@@ -38,8 +38,20 @@ export default function PostDetailPage() {
   const fetchPostDetails = useCallback(async () => {
     setLoading(true);
     try {
+      // モックポストの場合は404ページへリダイレクト
+      if (postId.startsWith('mock-')) {
+        toast.error('この投稿はサンプルデータです');
+        router.push('/board/categories');
+        return;
+      }
+      
       const response = await fetch(`/api/board/posts/${postId}`);
       if (!response.ok) {
+        if (response.status === 404) {
+          toast.error('投稿が見つかりません');
+          router.push('/board/categories');
+          return;
+        }
         throw new Error('Failed to fetch post');
       }
       const data = await response.json();
@@ -47,10 +59,12 @@ export default function PostDetailPage() {
       setReplies(data.replies || []);
     } catch (error) {
       console.error('Error fetching post:', error);
+      toast.error('投稿の取得に失敗しました');
+      router.push('/board/categories');
     } finally {
       setLoading(false);
     }
-  }, [postId]);
+  }, [postId, router]);
 
   useEffect(() => {
     if (postId) {

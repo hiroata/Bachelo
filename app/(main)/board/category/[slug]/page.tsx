@@ -167,12 +167,20 @@ export default function CategoryDetailPage() {
       console.log('Available categories:', categoriesData);
       
       // スラッグまたは名前でカテゴリーを見つける
-      const dbCategory = categoriesData.find((cat: any) => 
-        cat.slug === categorySlug || 
-        cat.name === category.name ||
-        cat.name.includes(category.name) ||
-        category.name.includes(cat.name)
-      );
+      // まず完全一致を試みる
+      let dbCategory = categoriesData.find((cat: any) => cat.slug === categorySlug);
+      
+      // スラッグで見つからない場合は名前で検索
+      if (!dbCategory) {
+        dbCategory = categoriesData.find((cat: any) => cat.name === category.name);
+      }
+      
+      // それでも見つからない場合は部分一致で検索
+      if (!dbCategory) {
+        dbCategory = categoriesData.find((cat: any) => 
+          cat.name.includes(category.name) || category.name.includes(cat.name)
+        );
+      }
       
       console.log('Found DB category:', dbCategory, 'for slug:', categorySlug, 'and name:', category.name);
       
@@ -214,9 +222,15 @@ export default function CategoryDetailPage() {
         firstPost: data.posts?.[0]?.title
       });
       
-      // 実データとモックデータを合わせる
-      const mockPosts = generateMockPosts();
-      const allPosts = [...(data.posts || []), ...mockPosts];
+      // 実データが少ない場合のみ少数のモックデータを追加
+      const realPosts = data.posts || [];
+      let allPosts = [...realPosts];
+      
+      // 実データが5件未満の場合のみモックデータを追加
+      if (realPosts.length < 5) {
+        const mockPosts = generateMockPosts().slice(0, 5 - realPosts.length);
+        allPosts = [...realPosts, ...mockPosts];
+      }
       
       // ソート処理
       const sortedPosts = sortPosts(allPosts, sortBy);
@@ -458,13 +472,28 @@ export default function CategoryDetailPage() {
                       {post.replies_count || 0} 返信
                     </span>
                   </div>
-                  <Link
-                    href={`/board/post/${post.id}`}
-                    className="text-pink-500 hover:text-pink-600 font-medium flex items-center gap-1"
-                  >
-                    詳細を見る
-                    <span>→</span>
-                  </Link>
+                  {post.id.startsWith('mock-') ? (
+                    <button
+                      onClick={() => {
+                        toast('この投稿はサンプルデータです。\n実際の投稿を作成してみましょう！', {
+                          icon: '💡',
+                          duration: 3000
+                        });
+                      }}
+                      className="text-pink-500 hover:text-pink-600 font-medium flex items-center gap-1"
+                    >
+                      詳細を見る
+                      <span>→</span>
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/board/post/${post.id}`}
+                      className="text-pink-500 hover:text-pink-600 font-medium flex items-center gap-1"
+                    >
+                      詳細を見る
+                      <span>→</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
